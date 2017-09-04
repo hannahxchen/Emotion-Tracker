@@ -65,9 +65,9 @@ socket.on('userCreated', function(data){
 	userCreated = data;
 });
 
-$('input').click(function(){
+/*$('input').click(function(){
   $(this).blur();
-});
+});*/
 
 function getLights(hueIP, username){
   $.ajax({
