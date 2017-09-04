@@ -10,6 +10,22 @@ div.input-group {
   padding-top: 60px;
 }
 
+#countdown-img {
+  width: 338px;
+  hieght: 338px;
+  -webkit-border-radius: 169px;
+  -moz-border-radius: 169px;
+  border-radius: 169px;
+  overflow:hidden;
+}
+
+#countdownPic {
+  display: block;
+  margin: auto;
+  height: auto;
+  width: 100%;
+}
+
 .btn-group .active {
   background-color : yellow;
 }

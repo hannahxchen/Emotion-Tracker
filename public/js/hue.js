@@ -32,25 +32,29 @@ $('#search').click(function(){
 
 function createUser(hueIP, option){
 	var count = 10;
-	$('#countdown').text('請按下bridge上的按鈕進行配對，倒數：' + count);
+	$('#countdown').text('請按下bridge上的按鈕進行配對，倒數：');
+  $("#countdownPic").attr("src","/img/countdown.gif");
 	$('#countdown').show();
 	socket.emit('hueIP', hueIP);
 	var counter = setInterval(function(){
-		$('#countdown').text('請按下bridge上的按鈕進行配對，倒數：' + count);
+		$('#countdown').text('請按下bridge上的按鈕進行配對，倒數：');
 		count--;
 		socket.emit('hueIP', hueIP);
 		if(count == -1 && option == 'search'){
 			clearInterval(counter);
 			$('#countdown').text('無法配對裝置!');
+      $("#countdownPic").attr("src","");
 		}
 		else if(count == -1 && option == 'auto'){
 			clearInterval(counter);
+      $("#countdownPic").attr("src","");
 			$('#ipArea').fadeIn();
 			$('#countdown').hide();
 		}
 		else if(userCreated){
       username = userCreated;
 			clearInterval(counter);
+      $("#countdownPic").attr("src","");
       getLights(hueIP, username);
       getGroups(hueIP, username);
       $('#ipArea').add('#countdown').fadeOut(400, function(){
@@ -64,10 +68,6 @@ function createUser(hueIP, option){
 socket.on('userCreated', function(data){
 	userCreated = data;
 });
-
-/*$('input').click(function(){
-  $(this).blur();
-});*/
 
 function getLights(hueIP, username){
   $.ajax({
