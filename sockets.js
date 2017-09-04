@@ -122,10 +122,6 @@ module.exports=function(io){
 						}).select("-password -_v");
 					});
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> origin/master
 					socket.on('push data start', function(start){
 						if(start == true) socket.emit('getUsername', faceDetect.username);
 						/*if(start == true){
@@ -143,28 +139,6 @@ module.exports=function(io){
 						Face.findOne(query, function(err, face){
 						if(err) throw err;
 						face.data.forEach(function(element){
-<<<<<<< HEAD
-=======
-=======
-		socket.on('push data start', function(start){
-			if(start == true) socket.emit('getUsername', faceDetect.username);
-			/*if(start == true){
-				var query = {username: index.username};
-				var joy = [];
-				var sadness = [];
-				var disgust = [];
-				var contempt = [];
-				var anger = [];
-				var fear = [];
-				var surprise = [];
-				var valence = [];
-				var engagement = [];
-				var createdAt = [];
-				Face.findOne(query, function(err, face){
-					if(err) throw err;
-					face.data.forEach(function(element){
->>>>>>> origin/master
->>>>>>> origin/master
 						joy.push(element.emotion[0].joy);
 						sadness.push(element.emotion[0].sadness);
 						disgust.push(element.emotion[0].disgust);

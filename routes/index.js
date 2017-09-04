@@ -130,14 +130,4 @@ router.get('/strokeTest', function(req, res){
   res.render('strokeTest');
 });
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-router.get('/hueLight', function(req, res){
-	res.render('hueAPI');
-});
-
->>>>>>> origin/master
->>>>>>> origin/master
 module.exports = router;
