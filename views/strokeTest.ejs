@@ -1,0 +1,61 @@
+<% include partials/head %>
+<title>Fast Stroke Test</title>
+<script async src="/js/libs/brf/BRFv4_JS_trial.js"></script>
+<!--<script src="https://download.affectiva.com/js/3.1/affdex.js"></script>-->
+<script type="text/javascript" src="/js/libs/webcamjs/webcam.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<style type="text/css">
+		#my_camera{
+  		margin-right: auto;
+  		margin-left: auto;
+		}
+
+		#image_canvas{
+			margin: auto;
+  		display: block;
+		}
+
+		#wrapper{
+			padding-top: 40px;
+		}
+
+		#shot,
+		#reshot,
+		#submit_photo{
+  		display: flex;
+  		justify-content: center;
+		}
+	</style>
+</head>
+<body>
+  <% include partials/navbar %>
+  <div class="row" id="wrapper">
+    <div class="col-md-10" style="width:680px;height:480px;">
+      <div id="my_camera"></div>
+      <div id="shot" style="display:none">
+        <input type=button value="拍照" onClick="preview_snapshot()">
+      </div>
+      <div id="reshot" style="display:none">
+        <input type=button value="重拍" onClick="cancel_preview()">
+      </div>
+      <div id="submit_photo" style="display:none">
+        <input type=button value="送出" onClick="startTest()">
+      </div>
+      <hr>
+      <canvas id="image_canvas" width="640" height="480"></canvas>
+    </div>
+    <div class="col-md-4">
+      <div style="height:25em;">
+        <strong>EMOTION TRACKING RESULTS</strong>
+        <div id="results" style="word-wrap:break-word;"></div>
+      </div>
+      <div>
+        <strong>DETECTOR LOG MSGS</strong>
+      </div>
+      <div id="logs"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="/js/stroke.js"></script>
+</body>
+</html>

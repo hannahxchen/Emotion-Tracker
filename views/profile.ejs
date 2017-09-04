@@ -1,0 +1,40 @@
+<% include partials/head %>
+    <title>Profile</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  </head>
+  <body>
+    <% include partials/navbar %>
+    <div class="container">
+
+      <div class="panel panel-default" style="margin-top: 10px; width: 40%">
+        <div class="panel-heading">個人資料</div>
+        <table class="table table-bordered" id="visitor-table">
+          <thead>
+            <tr><td colspan="2" align="center"><img src="<%= user.img_base64 %>" style="width: 35%"/></td></tr>
+            <tr>
+              <th><strong>User ID</strong></th><th><%= user.username %></th>
+            </tr>
+            <tr>
+              <th><strong>姓名</strong></th><th><%= user.name %></th>
+            </tr>
+            <tr>
+              <th><strong>性別</strong></th><th><%= user.gender %></th>
+            </tr>
+            <tr>
+              <th><strong>年齡</strong></th><th><%= user.age %></th>
+            </tr>
+            <tr>
+              <th><strong>Email</strong></th><th><%= user.email %></th>
+            </tr>
+            <tr>
+              <th><strong>註冊時間</strong></th><th><%= moment(user.createdAt).format('YYYY-MM-DD hh:mm:ss a'); %></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </div>
+    <% include partials/footer %>
+  </body>
+</html>

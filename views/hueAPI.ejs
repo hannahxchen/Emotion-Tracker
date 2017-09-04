@@ -1,0 +1,178 @@
+<% include partials/head %>
+<title>Philips Hue</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/bootstrap-slider.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/css/bootstrap-slider.min.css">
+<link rel="stylesheet" href="/css/titatoggle-dist.css">
+<link rel="stylesheet" href="/css/bootstrap-colorselector.css">
+<script src="/js/bootstrap-colorselector.js"></script>
+<link rel="stylesheet" href="/css/hue.css">
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <% include partials/navbar %>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/master
+  <div class="container" id="initialize" style="text-align: center;"><h4>搜尋 Bridge IP 中......</h4></div>
+  <div class="container" style="display: none;" id="ipArea">
+    <div class="input-group">
+      <input type="text" id="hueIP" class="form-control" placeholder="請輸入您的Bridge IP......">
+      <span id="search" class="input-group-btn">
+        <button class="btn btn-default" type="button">搜尋!</button>
+<<<<<<< HEAD
+      </span>
+    </div>
+  </div>
+  <div id="countdown" style="padding-top: 40px; text-align: center; display: none;"></div>
+
+  <div class="container" id="selectorArea" style="display: none; margin: 0 auto;">
+=======
+      </span>
+    </div>
+  </div>
+  <div id="countdown" style="padding-top: 40px; text-align: center; display: none;"></div>
+
+  <div class="container" id="selectorArea" style="display: none; margin: 0 auto;">
+=======
+  <div class="container" id="ipArea">
+    <div class="input-group">
+      <input type="text" id="hueIP" class="form-control" placeholder="請輸入您的Hue IP......">
+      <span class="input-group-btn">
+        <button id="search" class="btn btn-default" type="button">搜尋!</button>
+      </span>
+    </div>
+  </div>
+
+  <div class="container" id="selectorArea">
+>>>>>>> origin/master
+>>>>>>> origin/master
+    <h4>開關</h4>
+    <div class="checkbox checkbox-slider--b-flat">
+      <label>
+        <input type="checkbox" checked>
+        <span id="switch">On</span>
+      </label>
+    </div>
+
+    <h4 style="display: inline-block;">群組</h4>
+    <span class="btn btn-xs btn-hover btn-default glyphicon glyphicon-pencil" style="border:none; color: #6495ED; margin-left: 30px" id="edit"></span>
+    <div class="panel panel-default" style="width: 400px; background-color: #F5F5F5;">
+      <div class="panel-body">
+        <div class="input-group" style="width: 300px; padding-bottom:20px;">
+          <input type="text" class="form-control">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" style="background-color: #4682B4; color: #FFFFFF;">新增</button>
+          </span>
+        </div>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/master
+        <div id="selectLights" class="btn-group" data-toggle="buttons" style="text-align:center;"></div>
+        <hr style="border-color: #DCDCDC; border-width: 2px;">
+        <div id="removeGroups" style="padding-left: 20px"></div>
+      </div>
+    </div>
+
+    <h4>燈泡</h4>
+    <div id="lamps"></div>
+
+    <h4>Hue IP 資訊</h4>
+    <h5 style="display: inline;">IP: </h5><span id="ip"></span><br>
+    <h5 style="display: inline;">選擇角色: </h5><span id="actor"></span>
+<<<<<<< HEAD
+=======
+=======
+        <div id="selectLights" style="text-align:center;">
+          <button type="button" class="btn btn-default" style="border-radius:10px;">房間1</button>
+          <button type="button" class="btn btn-default" style="border-radius:10px;">房間2</button>
+          <button type="button" class="btn btn-default" style="border-radius:10px;">房間3</button>
+        </div>
+        <hr style="border-color: #DCDCDC; border-width: 2px;">
+        <div id="editgroup" style="padding-left: 20px">
+          <button type="button" class="btn btn-default" style="border-radius:10px;">臥室<i class="fa fa-times" aria-hidden="true" style="padding-left: 5px;"></i></button>
+        </div>
+      </div>
+    </div>
+    <h4>燈泡</h4>
+    <button type="button" class="btn btn-default">房間1</button>
+    <button type="button" class="btn btn-default">房間2</button>
+    <button type="button" class="btn btn-default">房間3</button>
+    <h4>Hue IP 資訊</h4>
+    <p><b>IP: </b><div id="ip"></div></p>
+    <p><b>選擇角色: </b><div id="actor"></div></p>
+>>>>>>> origin/master
+>>>>>>> origin/master
+
+    <hr>
+    <h4>亮度 </h4>
+    <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/>
+    <b id="brightness" style="padding-left: 10px;">0</b>
+
+    <h4>顏色</h4>
+    <div id="colorPicker" style="padding-top: 5px;">
+      <select id="colorselector">
+        <option value="106" data-color="#A0522D">sienna</option>
+          <option value="47" data-color="#CD5C5C" selected="selected">indianred</option>
+          <option value="87" data-color="#FF4500">orangered</option>
+          <option value="17" data-color="#008B8B">darkcyan</option>
+          <option value="18" data-color="#B8860B">darkgoldenrod</option>
+          <option value="68" data-color="#32CD32">limegreen</option>
+          <option value="42" data-color="#FFD700">gold</option>
+          <option value="77" data-color="#48D1CC">mediumturquoise</option>
+          <option value="107" data-color="#87CEEB">skyblue</option>
+          <option value="46" data-color="#FF69B4">hotpink</option>
+          <option value="47" data-color="#CD5C5C">indianred</option>
+          <option value="64" data-color="#87CEFA">lightskyblue</option>
+          <option value="13" data-color="#6495ED">cornflowerblue</option>
+          <option value="15" data-color="#DC143C">crimson</option>
+          <option value="24" data-color="#FF8C00">darkorange</option>
+          <option value="78" data-color="#C71585">mediumvioletred</option>
+          <option value="123" data-color="#000000">black</option>
+      </select>
+    </div>
+<<<<<<< HEAD
+
+    <div id="RGBmixer" style="padding-top: 20px;">
+      <p>
+        <b style="padding-right: 10px;">R</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="128" data-slider-id="RC" id="R" data-slider-tooltip="hide" data-slider-handle="round" />
+      </p>
+      <p>
+        <b style="padding-right: 10px;">G</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="128" data-slider-id="GC" id="G" data-slider-tooltip="hide" data-slider-handle="round" />
+      </p>
+      <p>
+        <b style="padding-right: 10px;">B</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="128" data-slider-id="BC" id="B" data-slider-tooltip="hide" data-slider-handle="round" />
+      </p>
+      <div id="RGB"></div>
+    </div>
+
+    <h4>場景</h4>
+    <div id="scenePicker">
+
+=======
+
+    <div id="RGBmixer" style="padding-top: 20px;">
+      <p>
+        <b style="padding-right: 10px;">R</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="128" data-slider-id="RC" id="R" data-slider-tooltip="hide" data-slider-handle="round" />
+      </p>
+      <p>
+        <b style="padding-right: 10px;">G</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="128" data-slider-id="GC" id="G" data-slider-tooltip="hide" data-slider-handle="round" />
+      </p>
+      <p>
+        <b style="padding-right: 10px;">B</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="128" data-slider-id="BC" id="B" data-slider-tooltip="hide" data-slider-handle="round" />
+      </p>
+      <div id="RGB"></div>
+    </div>
+
+    <h4>場景</h4>
+    <div id="scenePicker">
+
+>>>>>>> origin/master
+    </div>
+  </div>
+
+  <script type="text/javascript" src="/js/hue.js"></script>
+  <% include partials/footer %>
+</body>
+</html>

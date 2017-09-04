@@ -1,0 +1,64 @@
+<% include partials/head %>
+<title>活動申請</title>
+<script type="text/javascript" src="/js/libs/dropzone.js"></script>
+<link href="/css/dropzone.css" rel="stylesheet">
+<style>
+.container {
+  width: 800px;
+  margin: 0 auto;
+}
+</style>
+</head>
+<body>
+  <% include partials/navbar %>
+  <div class="container">
+    <form role="form">
+      <h2 class="text-left"><b>活動申請</b></h2>
+      <div class="form-group">
+        <div class="form-group row">
+          <div class="fileinput fileinput-new" data-provides="fileinput">
+            <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+            <div>
+              <span class="btn btn-default btn-file"><span class="fileinput-new"></span><span class="fileinput-exists"></span><input type="file" name="..."></span>
+              <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="example-text-input" class="col-2 col-form-label">申請人</label>
+          <input class="form-control" type="text" value="" id="example-text-input">
+        </div>
+        <div class="form-group row">
+          <label for="example-text-input" class="col-2 col-form-label">活動名稱</label>
+          <input class="form-control" type="text" value="" id="example-text-input">
+        </div>
+        <div class="form-group row">
+          <label for="example-email-input" class="col-2 col-form-label">聯絡Email</label>
+          <input class="form-control" type="email" value="" id="example-email-input">
+        </div>
+        <div class="form-group row">
+          <label for="example-tel-input" class="col-2 col-form-label">連絡電話</label>
+          <input class="form-control" type="tel" value="" id="example-tel-input">
+        </div>
+        <div class="form-group row">
+          <label for="example-date-input" class="col-2 col-form-label">活動日期</label>
+          <input class="form-control" type="date" value="2017-08-19" id="example-date-input">
+        </div>
+        <div class="form-group row">
+          <label for="example-password-input" class="col-2 col-form-label">活動資訊</label>
+          <textarea class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group row">
+          <div class="form-group">
+            <label>
+              <button class="btn btn-primary">送出</button>
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <% include partials/footer %>
+</body>
+</html>

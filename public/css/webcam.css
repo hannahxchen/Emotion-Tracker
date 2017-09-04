@@ -1,0 +1,10 @@
+#my_camera{
+  margin-right: auto;
+  margin-left: auto;
+}
+
+#pre_take_buttons,
+#post_take_buttons{
+  display: flex;
+  justify-content: center;
+}

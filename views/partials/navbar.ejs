@@ -1,0 +1,53 @@
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Emotion Tracker</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="/"><i class="fa fa-fw fa-home"></i>首頁</a></li>
+        <li><a href="/faceDetect/tracker"><i class="fa fa-fw fa-video-camera"></i>開始監測</a></li>
+        <li><a href="/strokeTest"><i class="fa fa-fw fa-eyedropper"></i>中風檢測</a></li>
+        <% if(user) {%>
+        <li><a href="/photoAlbum"><i class="fa fa-fw fa-picture-o"></i>我的相簿</a></li>
+        <li><a href="/hueLight"><i class="fa fa-fw fa-lightbulb-o"></i>Philips Hue</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-gamepad"></i>我的活動<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#"><i class="fa fa-fw fa-history"></i>活動紀錄</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/activities/apply"><i class="fa fa-fw fa-check-square-o"></i>活動申請</a></li>
+          </ul>
+        </li>
+        <% } %>
+        <% if(role=='admin') {%>
+          <li><a href="/faceDetect/monitor"><i class="fa fa-fw fa-area-chart"></i>監測數據</a></li>
+          <li><a href="/faceDetect/visitors"><i class="fa fa-fw fa-handshake-o"></i>訪客管理</a></li>
+        <% } %>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <% if(user) {%>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-user-circle"></i><%= user.name %><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="/faceDetect/trackerData"><i class="fa fa-fw fa-television"></i>監測結果</a></li>
+              <li><a href="/profile"><i class="fa fa-fw fa-user"></i>個人資料</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="#"><i class="fa fa-fw fa-cog"></i>設定</a></li>
+              <li><a href="/logout"><i class="fa fa-fw fa-power-off"></i>登出</a></li>
+            </ul>
+          </li>
+        <% } else{%>
+          <li><a href="/login"><i class="fa fa-fw fa-sign-in"></i>登入</a></li>
+          <li><a href="/register"><i class="fa fa-fw fa-user-plus"></i>註冊</a></li>
+        <% } %>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container-fluid -->
+</nav>
