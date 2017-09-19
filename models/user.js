@@ -1,67 +1,114 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 var autoIncrement = require('mongoose-auto-increment');
 var bcrypt = require('bcryptjs');
-var prefix = "v";
+var fs = require('fs');
+var kairos = require('../API/kairos');
+var Image = require('./image').Image;
+var img_function = require('./image');
+var Appearance = require('./appearance');
+var prefix = "user";
 
 // User Schema
 var UserSchema = mongoose.Schema({
-	username: {
-		type: String,
-		index:true
-	},
-	password: {type: String},
-	email: {type: String},
-	name: {type: String},
-	gender:{type: String},
-	age:{type: Number},
-	role: {
-		type: String,
-		default: 'user'
-	},
-	img_base64: {type: String},
+	username: String,
+	password: String,
+	email: String,
+	name: String,
+	gender: String,
+	birth: Date,
+	role: String,
+	profile_picture_id: String,
+	latest_picture_id: String,
 	createdAt: {
     type: Date,
     default: Date.now
   },
-	face: [{ type: Schema.Types.ObjectId, ref: 'Face' }]
+},
+{
+	toObject: {virtuals:true},
+	toJSON: {virtuals:true}
 });
 
-autoIncrement.initialize(mongoose.connection);
+UserSchema.virtual('profile_picture', {
+	ref: 'Avatar',
+	localField: 'profile_picture_id',
+	foreignField: 'avatarID',
+	justOne: true
+});
 
-UserSchema.plugin(autoIncrement.plugin, 'User');
+UserSchema.virtual('latest_picture', {
+	ref: 'Avatar',
+	localField: 'latest_picture_id',
+	foreignField: 'avatarID',
+	justOne: true
+});
+
+
+autoIncrement.initialize(mongoose.connection);
+UserSchema.plugin(autoIncrement.plugin, { model: 'User', prefix: prefix, field: 'userID'});
 
 var User = module.exports = mongoose.model('User', UserSchema);
 
-module.exports.createUser = function(newUser, callback){
-	bcrypt.genSalt(10, function(err, salt) {
-	    bcrypt.hash(newUser.password, salt, function(err, hash) {
-	        newUser.password = hash;
-	        newUser.save(callback);
-	    });
-	});
-};
-
-module.exports.saveVisitor = function saveVisitor(newVisitor, callback){
+module.exports.createUser = function(newUser, img, callback){
+	var res = {};
   User.nextCount(function(err, count){
-		console.log('count:', count);
-		var visitorUsername = prefix + count.toString();
-		module.exports.count = count.toString();
-    module.exports.visitorUsername = visitorUsername;
-		callback();
-    newVisitor.save(function(err){
-      if(err) throw err;
+		var userID = count;
+		kairos.enroll(img, userID, function(status, appearance){
+			var newAppearnce = new Appearance({user_id: userID});
+      if (status == 'success'){
+				newAppearnce.age = appearance.age;
+				if(appearance.glasses == 'None')
+					newAppearnce.glasses = false;
+				else
+					newAppearnce.glasses = true;
+				img_function.saveFirstAvatar(userID, img, newAppearnce, function(imgID){
+					newUser.profile_picture_id = imgID;
+					newUser.latest_picture_id = imgID;
+					bcrypt.genSalt(10, function(err, salt) {
+					    bcrypt.hash(newUser.password, salt, function(err, hash) {
+					        newUser.password = hash;
+					        newUser.save(callback);
+					    });
+					});
+				});
+				res.error = false;
+			}
+      else
+        res.error = true;
     });
   });
+	return res;
 };
 
-module.exports.getUserByUsername = function(username, callback){
-	var query = {username: username};
-	User.findOne(query, callback);
-};
-
-module.exports.getUserById = function(id, callback){
-	User.findById(id, callback);
+module.exports.saveUnknown = function saveUnknown(img, callback){
+  User.nextCount(function(err, count){
+		var userID = count;
+		var newUser = new User({userID: userID, role: 'unknown'});
+		var newAppearnce = new Appearance({user_id: userID});
+		kairos.enroll(img, userID, function(status, appearance){
+      if (status == 'success'){
+				newUser.gender = appearance.gender.type;
+				newAppearnce.age = appearance.age;
+				if(appearance.glasses == 'None')
+					newAppearnce.glasses = false;
+				else
+					newAppearnce.glasses = true;
+				img_function.saveAvatar(img, userID, newAppearnce, function(imgID){
+					newUser.profile_picture_id = imgID;
+					newUser.latest_picture_id = imgID;
+			    newUser.save(function(err){
+			      if(err) throw err;
+			    });
+				});
+				var error = false;
+				if(callback) callback(error, userID, appearance.age);
+			}
+      else{
+				var error = true;
+				if(callback) callback(res.error);
+			}
+    });
+  });
 };
 
 module.exports.validPassword = function(candidatePassword, hash, callback){

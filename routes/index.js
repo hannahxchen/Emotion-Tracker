@@ -31,18 +31,25 @@ router.get('/register', function(req, res){
 
 router.post('/register', function(req, res){
 	var name = req.body.name;
+	var gender = req.body.gender;
+	var role = req.body.role;
 	var email = req.body.email;
+	var birthday = req.body.birthday;
 	var username = req.body.username;
 	var password = req.body.password;
 	var password2 = req.body.password2;
 	var img_error = '';
 	var shot = req.body.ifshot;
+	var img;
 	console.log(shot);
 
 	// Validation
 	req.checkBody('name', '請輸入姓名').notEmpty();
+	req.checkBody('role', '請選擇註冊身分').notEmpty();
 	req.checkBody('email', 'Email 為必填').notEmpty();
 	req.checkBody('email', 'Email 格式錯誤').isEmail();
+	req.checkBody('birthday', '生日為必填').notEmpty();
+	req.checkBody('gender', '請選擇性別').notEmpty();
 	req.checkBody('username', '請輸入帳號').notEmpty();
 	req.checkBody('password', '請輸入密碼').notEmpty();
 	req.checkBody('password2', '確認密碼錯誤').equals(req.body.password);
@@ -51,8 +58,7 @@ router.post('/register', function(req, res){
 		console.log('no profile pic');
 		img_error = '請拍張個人照';
 	}else{
-		var img = req.body.img_uri;
-		var img_uri = img.replace('data:image/jpeg;base64,', '');
+		img = req.body.img;
 	}
 
 	var errors = req.validationErrors();
@@ -71,26 +77,25 @@ router.post('/register', function(req, res){
 			email:email,
 			username: username,
 			password: password,
-			img_base64: img
+			role: role,
+			birth: birthday,
+			gender: gender
 		});
 
-		User.createUser(newUser, function(err, user){
+		var response = User.createUser(newUser, img, function(err, user){
 			if(err) throw err;
-			//console.log(user);
+			else console.log(user);
 		});
 
-		kairos.enroll(img_uri, username, gallery, function(){
-			query = {username: username};
-			update = {gender: kairos.attributes.gender.type, age: kairos.attributes.age};
-			User.updateUser(query, update);
-		});
-
-		var newFace = new Face({username: username});
-		Face.saveFace(newFace);
-
-		req.flash('success_msg', 'You are registered and can now login');
-
-		res.redirect('/login');
+		if(response.error){
+			res.render('register',{
+				img_error: "偵測不到臉，請再重拍一次"
+			});
+		}
+		else{
+			req.flash('success_msg', '註冊完成，您現在可以進行登入！');
+			res.redirect('/login');
+		}
 	}
 });
 
@@ -124,10 +129,6 @@ router.get('/logout', function(req, res){
 
 router.get('/profile', ensureAuthenticated, function(req, res){
 	res.render('profile', { user: req.user, moment: moment });
-});
-
-router.get('/strokeTest', function(req, res){
-  res.render('strokeTest');
 });
 
 module.exports = router;

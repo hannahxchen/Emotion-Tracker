@@ -3,6 +3,9 @@ var router = express.Router();
 var Token = require('../models/token');
 var User = require('../models/user');
 var Face = require('../models/face');
+var Image = require('../models/image').Image;
+var ProfilePic = require('../models/image').ProfilePic;
+var kairos = require('../API/kairos');
 var moment = require('moment');
 
 router.get('/user', function(req, res){
@@ -102,6 +105,37 @@ router.post('/face/emotion', function(req, res){
           res.json({success: true, username: data.username, data: emotions});
         }).select("-_v -_id");
       }
+    }
+  });
+});
+
+router.post('/recognize', function(req, res){
+  kairos.recognize(req.body.image, function(error, status,userID){
+    if (status == 'failure')
+      res.json({userID: 'unknown'});
+    else if (status == 'success')
+      res.json({userID: userID});
+    else
+      res.json({error: true});
+  });
+});;
+
+router.post('/enroll', function(req, res){
+  var data = User.saveUnknwon(req.body.image);
+  if(data.error)
+    res.json({error: true});
+  else
+    res.json({userID: data.userID, age: data.age});
+});;
+
+router.post('/detect', function(req, res){
+  kairos.detect(req.body.image, function(error, status, age, glasses){
+    if(status == 'failure'){
+      if(error == 'no face found') res.json({error: error});
+      else res.json({error: error});
+    }
+    else if (status == 'success'){
+      res.json({age: age, glasses: glasses});
     }
   });
 });

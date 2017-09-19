@@ -29,7 +29,7 @@ autoIncrement.initialize(db);
 
 connections=[];
 
-var server=require('http').createServer(app).listen(port, '120.126.15.20');
+var server=require('http').createServer(app).listen(port);
 var io=require('socket.io').listen(server);
 require('./sockets')(io);
 console.log('Server running on port : ' + port );
@@ -37,9 +37,14 @@ console.log('Server running on port : ' + port );
 var routes = require('./routes/index');
 var faceDetect = require('./routes/faceDetect');
 var api = require('./routes/api');
-var imageFile = require('./routes/imageFile');
+//var imageFile = require('./routes/imageFile');
 var activity = require('./routes/activity');
 var hueLight = require('./routes/hueLight');
+var videos = require('./routes/videos');
+var photos = require('./routes/photos');
+var admin = require('./routes/admin');
+var strokeTest = require('./routes/strokeTest');
+var magicMirror = require('./routes/magicMirror');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -99,6 +104,11 @@ app.use(function (req, res, next) {
 app.use('/', routes);
 app.use('/faceDetect', faceDetect);
 app.use('/api', api);
-app.use('/photoAlbum', imageFile);
+//app.use('/photoAlbum', imageFile);
 app.use('/activities', activity);
+app.use('/photos', photos);
+app.use('/videos', videos);
+app.use('/strokeTest', strokeTest);
+app.use('/admin', admin);
 app.use('/hueLight', hueLight);
+app.use('/magicMirror', magicMirror);

@@ -15,8 +15,10 @@
   		display: block;
 		}
 
-		#wrapper{
-			padding-top: 40px;
+		#imageDetect,
+		#speechTest{
+			padding-top: 60px;
+			padding-left: 40px;
 		}
 
 		#shot,
@@ -25,11 +27,21 @@
   		display: flex;
   		justify-content: center;
 		}
+
+		#speechResults {
+			height: 200px;
+			border: 1px solid #ccc;
+			padding: 10px;
+			box-shadow: 0 0 10px 0 #bbb;
+			margin-bottom: 30px;
+			font-size: 14px;
+			line-height: 25px;
+		}
 	</style>
 </head>
 <body>
   <% include partials/navbar %>
-  <div class="row" id="wrapper">
+  <div class="row" id="imageDetect">
     <div class="col-md-10" style="width:680px;height:480px;">
       <div id="my_camera"></div>
       <div id="shot" style="display:none">
@@ -45,16 +57,30 @@
       <canvas id="image_canvas" width="640" height="480"></canvas>
     </div>
     <div class="col-md-4">
-      <div style="height:25em;">
-        <strong>EMOTION TRACKING RESULTS</strong>
+      <div style="height:10em;">
+        <strong>偵測結果：</strong>
         <div id="results" style="word-wrap:break-word;"></div>
       </div>
       <div>
-        <strong>DETECTOR LOG MSGS</strong>
+        <strong>偵測器訊息：</strong>
       </div>
-      <div id="logs"></div>
+      <div id="logs" style="padding-bottom: 100px;"></div>
+			<button id="next" class="btn btn-primary" style="display: none;">開始進行語音檢測</button>
     </div>
   </div>
+
+	<div id="speechTest" style="display: none; align-items: center;">
+		<div class="col-md-6" id="plainText"></div>
+		<div class="col-md-6" id="recordArea" style="padding-right: 40px;">
+			<div id="speechResults">
+		  	<span id="final_span" class="final"></span>
+		  	<span id="interim_span" class="interim"></span>
+			</div>
+			<button class="btn btn-default" id="start_button"><i class="fa fa-fw fa-microphone" aria-hidden="true"></i></a>
+			<br>
+			<button class="btn btn-primary" id="sendAudio" style="display: none;">送出</button>
+		</div>
+	</div>
 
   <script type="text/javascript" src="/js/stroke.js"></script>
 </body>

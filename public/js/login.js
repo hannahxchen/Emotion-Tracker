@@ -32,7 +32,8 @@ function snap(counter){
   $('#countdown').append("身分辨識中......");
   Webcam.freeze();
   Webcam.snap(function(data_uri){
-    socket.emit('login-img', data_uri);
+    var image = data_uri.replace('data:image/jpeg;base64,', '');
+    socket.emit('login-img', image);
   });
 }
 

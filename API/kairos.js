@@ -1,7 +1,9 @@
 var request = require('request');
-var configAPI = require('../config/kairos_api');
+var Q = require('q');
+var configAPI = require('../config/kairos_api').account;
+var gallery = require('../config/kairos_api').gallery;
 
-module.exports.enroll = function(img, subject_id, gallery, callback){
+module.exports.enroll = function(img, subject_id, callback){
   var options = {
     method: 'POST',
     uri: 'https://api.kairos.com/enroll',
@@ -22,10 +24,14 @@ module.exports.enroll = function(img, subject_id, gallery, callback){
     if (!error && response.statusCode == 200) {
       var data=JSON.stringify(body);
       console.log(data);
-      if(body.Errors) module.exports.error = body.Errors;
+      if(body.Errors){
+        var status = 'failure';
+        var error = true;
+      }
       else if(body.images[0].transaction.status == "success"){
-        module.exports.attributes = body.images[0].attributes;
-        if(callback) callback();
+        var status = 'success';
+        var appearance = body.images[0].attributes;
+        callback(status, appearance);
       }
     }
     else{
@@ -34,7 +40,7 @@ module.exports.enroll = function(img, subject_id, gallery, callback){
   });
 };
 
-module.exports.recognize = function(img, gallery, callback){
+module.exports.recognize = function(img, callback){
   var options = {
     method: 'POST',
     uri: 'https://api.kairos.com/recognize',
@@ -55,19 +61,61 @@ module.exports.recognize = function(img, gallery, callback){
       var data=JSON.stringify(body);
       console.log(data);
       if(body.Errors){
-        module.exports.error = body.Errors;
-        if(callback) callback();
+        var error = true;
       }
       else if(body.images[0].transaction.status == "success"){
-        module.exports.status = body.images[0].transaction.status;
-        module.exports.id = body.images[0].transaction.subject_id;
-        console.log(body.images[0].transaction.subject_id, body.images[0].transaction.confidence);
-        if(callback) callback();
+        var status = 'success';
+        var id = body.images[0].transaction.subject_id;
+        console.log(id, body.images[0].transaction.confidence);
       }
       else if(body.images[0].transaction.status == "failure"){
-        module.exports.status = body.images[0].transaction.status;
-        if(callback) callback();
+        var status = 'failure';
+        var id = body.images[0].transaction.subject_id;
       }
+      callback(error, status, id);
+    }
+    else{
+      console.log(error);
+    }
+  });
+};
+
+module.exports.detect = function(img, callback){
+  var options = {
+    method: 'POST',
+    uri: 'https://api.kairos.com/detect',
+    headers: {
+      'Content-Type':'application/json',
+      'app_id': configAPI.app_id ,
+      'app_key': configAPI.app_key
+    },
+    body: {
+      "image": img
+    },
+    json: true
+  };
+
+  request(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var data=JSON.stringify(body);
+      console.log(data);
+      if(body.images[0].status == "Complete"){
+        if(body.images[0].faces.length > 1 ){
+          var status = 'failure';
+          var error = 'too many faces'
+        }
+        else{
+          var status = 'success';
+          var age = body.images[0].faces[0].attributes.age;
+          if(body.images[0].faces[0].attributes.glasses == 'None') var glasses = false;
+          else var glasses = true;
+        }
+      }
+      else{
+        var status = 'failure';
+        var error = 'no face found';
+      }
+      callback(error, status, age, glasses);
     }
     else{
       console.log(error);

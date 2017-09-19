@@ -13,7 +13,7 @@ $(document).ready(function(){
 	$('#submit').on('click', function(){
     if(shot){
       Webcam.snap( function(data_uri) {
-        $('#img_uri').val(data_uri);
+        $('#img').val(data_uri.replace('data:image/jpeg;base64,', ''));
         $('#ifshot').val(shot);
       });
     }
@@ -21,4 +21,8 @@ $(document).ready(function(){
       $('#ifshot').val(shot);
     }
 	});
+
+	$('.dropdate').dropdate({
+    dateFormat:'yyyy/mm/dd'
+  });
 });

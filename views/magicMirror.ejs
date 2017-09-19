@@ -1,0 +1,102 @@
+<% include partials/head %>
+    <title>情緒魔鏡</title>
+    <script src="https://download.affectiva.com/js/3.1/affdex.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/bootstrap-slider.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/css/bootstrap-slider.min.css">
+    <script src="/js/libs/date.format.js"></script>
+    <script src="/js/libs/jquery-dropdate.js"></script>
+    <script type="text/javascript" src="/js/libs/webcamjs/webcam.min.js"></script>
+    <style type="text/css">
+    		#my_camera{
+      		margin-right: auto;
+      		margin-left: auto;
+    		}
+
+    		#imageDetect,
+    		#userInput{
+    			padding-top: 60px;
+    		}
+
+    		#shot,
+    		#reshot,
+    		#submit_photo{
+      		display: flex;
+      		justify-content: center;
+    		}
+    	</style>
+  </head>
+  <body>
+    <% include partials/navbar %>
+    <div id="logs" style="font-size: 20px; padding-top: 60px; text-align: center;"></div>
+    <div class="row" id="imageDetect" style="display: none; margin-left: 50px; font-size: 20px; padding-left: 50px;">
+      <div id="my_camera"></div>
+      <div id="shot">
+        <input type=button value="拍照" onClick="preview_snapshot()">
+      </div>
+      <div id="reshot" style="display:none">
+        <input type=button value="重拍" onClick="cancel_preview()">
+      </div>
+      <div id="submit_photo" style="display:none">
+        <input type=button value="送出" onClick="startTest()">
+      </div>
+      <div id="loadingMsg" style="padding-top: 30px; text-align: center;"></div>
+      <h2 id="resultsTitle" style="font-weight: bold; margin-bottom: 30px;"></h2>
+      <div class="row" id="age-wrapper">
+        <div class="col-md-4" id="physicalAge"></div>
+        <div class= "col-md-8" id="realAge"></div>
+      </div>
+      <hr>
+      <div class="row" id="emotion-wrapper" style="display: none;">
+        <div class="col-md-4" id="emotion">
+          <h3 id="dominantEmotion" style="margin-bottom: 30px;"></h3>
+          <div id="results"></div>
+        </div>
+        <div id="inputArea" class= "col-md-8">
+          <h3 style="margin-bottom: 30px;">請輸入您拍照時的實際情緒：</h3>
+          <div class="row" id="emotionInput" style="margin-left: 30px;">
+            <div style="margin-bottom: 30px;">
+              <span>開心</span>
+              <b style="padding-left: 30px; padding-right: 30px;">0</b><input id="joy-input" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/><b style="padding-left: 30px;">100</b>
+              <b style="border-style: solid; border-color: blue; padding-right: 10px; padding-left: 10px; margin-left: 50px;" id="joy-value"></b><br>
+            </div>
+            <div style="margin-bottom: 30px;">
+              <span>傷心</span>
+              <b style="padding-left: 30px; padding-right: 30px;">0</b><input id="sadness-input" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/><b style="padding-left: 30px;">100</b>
+              <b style="border-style: solid; border-color: blue; padding-right: 10px; padding-left: 10px; margin-left: 50px;" id="sadness-value"></b><br>
+            </div>
+            <div style="margin-bottom: 30px;">
+              <span>反感</span>
+              <b style="padding-left: 30px; padding-right: 30px;">0</b><input id="disgust-input" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/><b style="padding-left: 30px;">100</b>
+              <b style="border-style: solid; border-color: blue; padding-right: 10px; padding-left: 10px; margin-left: 50px;" id="disgust-value"></b><br>
+            </div>
+            <div style="margin-bottom: 30px;">
+              <span>滿意</span>
+              <b style="padding-left: 30px; padding-right: 30px;">0</b><input id="contempt-input" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/><b style="padding-left: 30px;">100</b>
+              <b style="border-style: solid; border-color: blue; padding-right: 10px; padding-left: 10px; margin-left: 50px;" id="contempt-value"></b><br>
+            </div>
+            <div style="margin-bottom: 30px;">
+              <span>生氣</span>
+              <b style="padding-left: 30px; padding-right: 30px;">0</b><input id="anger-input" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/><b style="padding-left: 30px;">100</b>
+              <b style="border-style: solid; border-color: blue; padding-right: 10px; padding-left: 10px; margin-left: 50px;" id="anger-value"></b><br>
+            </div>
+            <div style="margin-bottom: 30px;">
+              <span>害怕</span>
+              <b style="padding-left: 30px; padding-right: 30px;">0</b><input id="fear-input" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/><b style="padding-left: 30px;">100</b>
+              <b style="border-style: solid; border-color: blue; padding-right: 10px; padding-left: 10px; margin-left: 50px;" id="fear-value"></b><br>
+            </div>
+            <div style="margin-bottom: 30px;">
+              <span>驚訝</span>
+              <b style="padding-left: 30px; padding-right: 30px;">0</b><input id="surprise-input" type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/><b style="padding-left: 30px;">100</b>
+              <b style="border-style: solid; border-color: blue; padding-right: 10px; padding-left: 10px; margin-left: 50px;" id="surprise-value"></b><br>
+            </div>
+            <button id="submit" class="btn btn-default" style="margin-top: 50px; float: right; margin-right: 500px;">送出</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script type="text/javascript" src="/js/magicMirror.js"></script>
+    <% include partials/footer %>
+  </body>
+</html>

@@ -13,18 +13,45 @@
       <ul class="nav navbar-nav">
         <li><a href="/"><i class="fa fa-fw fa-home"></i>首頁</a></li>
         <li><a href="/faceDetect/tracker"><i class="fa fa-fw fa-video-camera"></i>開始監測</a></li>
-        <li><a href="/strokeTest"><i class="fa fa-fw fa-eyedropper"></i>中風檢測</a></li>
-        <li><a href="/hueLight"><i class="fa fa-fw fa-lightbulb-o"></i>Philips Hue</a></li>
+        <li><a href="/magicMirror"><i class="fa fa-fw fa-video-camera"></i>情緒魔鏡</a></li>
+
         <% if(user) {%>
-        <li><a href="/photoAlbum"><i class="fa fa-fw fa-picture-o"></i>我的相簿</a></li>
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-gamepad"></i>我的活動<span class="caret"></span></a>
+          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-eyedropper"></i>中風檢測<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#"><i class="fa fa-fw fa-history"></i>活動紀錄</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="/activities/apply"><i class="fa fa-fw fa-check-square-o"></i>活動申請</a></li>
+            <li><a href="/strokeTest"><i class="fa fa-fw fa-history"></i>開始檢測</a></li>
+            <li><a href="#"><i class="fa fa-fw fa-history"></i>檢測結果</a></li>
           </ul>
         </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-gamepad"></i>活動平台<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#"><i class="fa fa-fw fa-history"></i>熱門活動</a></li>
+            <li><a href="#"><i class="fa fa-fw fa-history"></i>我的活動</a></li>
+            <% if(role=='admin') {%>
+            <li role="separator" class="divider"></li>
+            <li><a href="/activities/upload"><i class="fa fa-fw fa-check-square-o"></i>上架活動</a></li>
+            <% } %>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-picture-o"></i>相片平台<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/photos"><i class="fa fa-fw fa-history"></i>照片動態</a></li>
+            <li><a href="#"><i class="fa fa-fw fa-history"></i>家庭相簿</a></li>
+            <li><a href="#"><i class="fa fa-fw fa-history"></i>活動相簿</a></li>
+            <li><a href="#"><i class="fa fa-fw fa-history"></i>我的社交圈</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-picture-o"></i>影片平台<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/videos"><i class="fa fa-fw fa-history"></i>影片動態</a></li>
+            <li><a href="#"><i class="fa fa-fw fa-history"></i>我的頻道</a></li>
+            <li><a href="#"><i class="fa fa-fw fa-history"></i>家庭頻道</a></li>
+          </ul>
+        </li>
+        <li><a href="/hueLight"><i class="fa fa-fw fa-lightbulb-o"></i>Philips Hue</a></li>
         <% } %>
         <% if(role=='admin') {%>
           <li><a href="/faceDetect/monitor"><i class="fa fa-fw fa-area-chart"></i>監測數據</a></li>

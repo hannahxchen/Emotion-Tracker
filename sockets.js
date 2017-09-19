@@ -4,7 +4,7 @@ var Face = require('./models/face');
 var SubFace = require('./models/subFace');
 var User = require('./models/user');
 var faceDetect = require('./routes/faceDetect');
-var gallery = require('./config/kairos_api').gallery;
+var kairos = require('./API/kairos');
 var hue = require("node-hue-api");
 var HueApi = hue.HueApi;
 
@@ -20,22 +20,22 @@ module.exports=function(io){
 		});
 
 		socket.on('login-img', function(img){
-			img = img.replace('data:image/jpeg;base64,', '');
-			kairos.recognize(img, gallery, get_id);
+			kairos.recognize(img, function(error, status, userID){
+				if(error) socket.emit('login', {success: false});
+				else if(status == "success"){
+					User.findOne({userID: userID}, function(err, doc){
+						if(err) throw err;
+						console.log('Login with username: ' + doc.username);
+						socket.emit('login', {success: true, id: doc.username});
+					});
+				}
+				else if(status == "failure"){
+					console.log("Unknown user");
+					socket.emit('login', {success: false});
+				}
+			});
 
 		});
-
-		function get_id(){
-			if(kairos.error) socket.emit('login', {success: false});
-			else if(kairos.status == "success"){
-				console.log("Got username:", JSON.stringify(kairos.id));
-				socket.emit('login', {success: true, id: kairos.id});
-			}
-			else if(kairos.status == "failure"){
-				console.log("Unknown user");
-				socket.emit('login', {success: false});
-			}
-		}
 
 		socket.on('tracker-img', function(img){
 			var img_uri = img.replace('data:image/jpeg;base64,', '');
@@ -51,26 +51,6 @@ module.exports=function(io){
 				}
 			});
 		});
-
-		function enroll_visitor(img){
-			var img_uri = img.replace('data:image/jpeg;base64,', '');
-			var newVisitor = new User({img_base64: img, role: 'visitor'});
-			User.saveVisitor(newVisitor, function(){
-				socket.emit('identity-confirmed', "true");
-				console.log(User.visitorUsername);
-				kairos.enroll(img_uri, User.visitorUsername, gallery, function(){
-					if(kairos.error) socket.emit('identity-confirmed', "false");
-					else{
-						var query = {'_id': User.count};
-						var update = {username: User.visitorUsername, gender: kairos.attributes.gender.type,
-							age: kairos.attributes.age};
-							User.updateUser(query, update);
-							var newFace = new Face({username: User.visitorUsername});
-							Face.saveFace(newFace);
-						}
-					});
-				});
-			}
 
 			socket.on('face-data', function(data){
 				if(kairos.status == "failure"){
@@ -93,8 +73,8 @@ module.exports=function(io){
 						socket.emit('load visitors', docs);
 					});
 
-					socket.on('selected-id', function(id){
-						User.getUserByUsername(id, function(err, user){
+					socket.on('selected-id', function(username){
+						User.findOne({username: username}, function(err, user){
 							if(err) throw err;
 							//console.log(user.username);
 							socket.emit('visitor data', user);
@@ -124,37 +104,6 @@ module.exports=function(io){
 
 					socket.on('push data start', function(start){
 						if(start == true) socket.emit('getUsername', faceDetect.username);
-						/*if(start == true){
-						var query = {username: index.username};
-						var joy = [];
-						var sadness = [];
-						var disgust = [];
-						var contempt = [];
-						var anger = [];
-						var fear = [];
-						var surprise = [];
-						var valence = [];
-						var engagement = [];
-						var createdAt = [];
-						Face.findOne(query, function(err, face){
-						if(err) throw err;
-						face.data.forEach(function(element){
-						joy.push(element.emotion[0].joy);
-						sadness.push(element.emotion[0].sadness);
-						disgust.push(element.emotion[0].disgust);
-						contempt.push(element.emotion[0].contempt);
-						anger.push(element.emotion[0].anger);
-						fear.push(element.emotion[0].fear);
-						surprise.push(element.emotion[0].surprise);
-						valence.push(element.emotion[0].valence);
-						engagement.push(element.emotion[0].engagement);
-						createdAt.push(element.createdAt);
-					});
-					socket.emit('push old data', {joy: joy, sadness: sadness, disgust: disgust,
-					contempt: contempt, anger: anger, fear: fear, surprise: surprise, valence: valence,
-					engagement: engagement}, createdAt);
-				});
-			}*/
 		});
 
 		socket.on('hueIP', function(hueIP){

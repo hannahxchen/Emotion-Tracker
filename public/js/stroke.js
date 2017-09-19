@@ -123,8 +123,6 @@ function trackFaces(image) {
 
 		var faces = brfManager.getFaces();
 
-		if(faces.length == 0) log('#results', "偵測不到臉!")
-
 		for(i = 0; i < faces.length; i++) {
 
 			var face = faces[i];
@@ -154,6 +152,10 @@ function trackFaces(image) {
 						face.vertices[points[1]], face.vertices[points[1] + 1]);
 					drawLine(face.vertices[points[2]], face.vertices[points[2] + 1],
 						face.vertices[points[3]], face.vertices[points[3] + 1]);
+					$('#next').show();
+				}
+				else{
+					log('#results', "偵測不到臉!");
 				}
 		}
 	}
@@ -185,3 +187,85 @@ function drawLine(p0_x, p0_y, p1_x, p1_y){
 	contxt.lineTo(p1_x, p1_y);
 	contxt.stroke();
 }
+
+function uploadResults(){
+	$.ajax({
+	    type: "POST",
+	    url: "/uploadResults",
+			contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: JSON.stringify({deg1: deg1, deg2: deg2}),
+	    success: function(data){
+
+			},
+	    failure: function(errMsg) {
+	        alert(errMsg);
+	    }
+	});
+}
+
+var final_transcript = '';
+var recognizing = false;
+var ignore_onend;
+
+$('#next').click(function(){
+	$('#next').hide();
+	$('#imageDetect').hide();
+	$('#speechTest').show();
+
+	if ('webkitSpeechRecognition' in window) {
+		var recognition = new webkitSpeechRecognition();
+		recognition.continuous = true;
+		recognition.interimResults = true;
+		recognition.onresult = function(event) {
+	    var interim_transcript = '';
+	    for (var i = event.resultIndex; i < event.results.length; ++i) {
+	      if (event.results[i].isFinal) {
+	        final_transcript += event.results[i][0].transcript;
+	      } else {
+	        interim_transcript += event.results[i][0].transcript;
+	    	}
+	  	}
+	    final_transcript = capitalize(final_transcript);
+	    $('#final_span').html = linebreak(final_transcript);
+	    $('#interim_span').html = linebreak(interim_transcript);
+	  };
+		recognition.onstart = function() {
+	    recognizing = true;
+	  };
+
+		recognition.onerror = function(event) {
+	    console.log(event.error);
+	  };
+
+	  recognition.onend = function() {
+	    recognizing = false;
+	  };
+	} else{
+		$('#results').html('您的瀏覽器無法支援，請更新瀏覽器至最新版！')
+	}
+
+	var two_line = /\n\n/g;
+	var one_line = /\n/g;
+	function linebreak(s) {
+		return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+	}
+
+	function capitalize(s) {
+		return s.replace(s.substr(0,1), function(m) { return m.toUpperCase(); });
+	}
+
+	$('#start_button').click(function(event){
+		if (recognizing) {
+			recognition.stop();
+			return;
+		}
+
+		final_transcript = '';
+		recognition.start();
+		ignore_onend = false;
+		recognition.lang = "cmn-Hant-TW";
+		final_span.innerHTML = '';
+		interim_span.innerHTML = '';
+	});
+});
