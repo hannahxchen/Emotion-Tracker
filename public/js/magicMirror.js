@@ -281,31 +281,31 @@ $('#submit').click(function(){
 	});
 });
 
-$("#joy").on("slide", function(slideEvt) {
+$("#joy-input").on("slide", function(slideEvt) {
 	$("#joy-value").text(slideEvt.value);
 	emotionInput['joy'] = slideEvt.value;
 });
-$("#sadness").on("slide", function(slideEvt) {
+$("#sadness-input").on("slide", function(slideEvt) {
 	$("#sadness-value").text(slideEvt.value);
 	emotionInput['sadness'] = slideEvt.value;
 });
-$("#anger").on("slide", function(slideEvt) {
+$("#anger-input").on("slide", function(slideEvt) {
 	$("#anger-value").text(slideEvt.value);
 	emotionInput['anger'] = slideEvt.value;
 });
-$("#fear").on("slide", function(slideEvt) {
+$("#fear-input").on("slide", function(slideEvt) {
 	$("#fear-value").text(slideEvt.value);
 	emotionInput['fear'] = slideEvt.value;
 });
-$("#disgust").on("slide", function(slideEvt) {
+$("#disgust-input").on("slide", function(slideEvt) {
 	$("#disgust-value").text(slideEvt.value);
 	emotionInput['disgust'] = slideEvt.value;
 });
-$("#contempt").on("slide", function(slideEvt) {
+$("#contempt-input").on("slide", function(slideEvt) {
 	$("#contempt-value").text(slideEvt.value);
 	emotionInput['contempt'] = slideEvt.value;
 });
-$("#surprise").on("slide", function(slideEvt) {
+$("#surprise-input").on("slide", function(slideEvt) {
 	$("#surprise-value").text(slideEvt.value);
 	emotionInput['surprise'] = slideEvt.value;
 });

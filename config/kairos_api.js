@@ -1,6 +1,6 @@
-module.exports={
+module.exports.account = {
   app_id : '',
   app_key : ''
 };
 
-module.exports.gallery = "Lab";
+module.exports.gallery = "";

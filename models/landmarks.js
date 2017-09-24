@@ -5,8 +5,12 @@ var prefix = 'landmarks_';
 
 var LandmarkSchema = mongoose.Schema({
   user_id: String,
-  media: String,
-  landmarks: Object,
+  media_id: String,
+  landmarks: [{
+    _id:false,
+    x: Number,
+    y: Number
+  }],
   createdAt: {
     type: Date,
     default: Date.now

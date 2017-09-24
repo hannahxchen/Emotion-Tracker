@@ -70,7 +70,7 @@ router.post('/submitData', function(req, res){
   newEmotion.save(function(err, emotion){
     if(err) throw err;
     var newCalibration = new Calibration({
-      detectedEmotions_id: emotion.detectedEmotions_id,
+      detectedEmotions_id: emotion.emotionID,
       trueValue: req.body.emotionInput,
       emotionDifference: emotionDifference,
       ageDifference: ageDifference,

@@ -8,7 +8,6 @@ var avatar_prefix = 'avatar_';
 var ImageSchema = mongoose.Schema({
   path: {
     type: String,
-    required: true,
     trim: true
   },
   people_id: [String],
@@ -48,8 +47,8 @@ autoIncrement.initialize(mongoose.connection);
 ImageSchema.plugin(autoIncrement.plugin, { model: 'Image', prefix: img_prefix, field: 'imageID' });
 AvatarSchema.plugin(autoIncrement.plugin, { model: 'Avatar', prefix: avatar_prefix, field: 'avatarID' });
 
-var Image = module.exports = mongoose.model('Image', ImageSchema);
-var Avatar = module.exports = mongoose.model('Avatar', AvatarSchema);
+var Image = module.exports.Image = mongoose.model('Image', ImageSchema);
+var Avatar = module.exports.Avatar = mongoose.model('Avatar', AvatarSchema);
 
 module.exports.saveFirstAvatar = function(userID, img, newAppearnce, callback){
   Image.nextCount(function(err, count){

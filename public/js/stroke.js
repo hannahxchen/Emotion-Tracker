@@ -1,3 +1,10 @@
+var angle;
+var img_base64;
+var sampleTextID;
+var sampleText;
+var audioText;
+var landmarks = [];
+
 //webcam setup
 Webcam.set({
 	// live preview size
@@ -49,6 +56,7 @@ function startTest(){
 		var img = new Image();
 		img.src = data_uri;
 		img.onload = imageLoaded;
+		img_base64 = data_uri.replace('data:image/jpeg;base64,', '');
 	});
 }
 
@@ -138,16 +146,29 @@ function trackFaces(image) {
 						imageDataCtx.stroke();
 					}
 
+					for(var i = 0; i < 68 ; i++){
+						landmarks.push({
+							x: face.vertices[2*i],
+							y: face.vertices[2*i + 1]
+						});
+					}
+
+
 					//deviation of angle of mouth
-					var points = [48*2 , 54*2, 8*2, 27*2]; //[Right Lip Corner, Left Lip Corner, Nose Root, Tip of Chin]
+					var points = [48*2 , 54*2, 8*2, 27*2]; //[Left Lip Corner, Right Lip Corner, Nose Root, Tip of Chin]
 					var m1 = getSlope(face.vertices[points[0]], face.vertices[points[0] + 1],
 						face.vertices[points[1]], face.vertices[points[1] + 1]);
 					var m2 = getSlope(face.vertices[points[2]], face.vertices[points[2] + 1],
 						face.vertices[points[3]], face.vertices[points[3] + 1]);
-					var deg1 = calcAngle(m1, m2);
-					var deg2 = 180 - deg1;
-					log('#results', "deg1: " + deg1);
-					log('#results', "deg2: " + deg2);
+
+					var deg = calcAngle(m1, m2);
+					angle = Math.abs(90 - deg);
+					if(face.vertices[points[0] + 1] < face.vertices[points[1] + 1]){
+						log('#results', "順時針傾斜(左高右低): " + angle + "°");
+						angle *= (-1);
+					}
+					else log('#results', "逆時針傾斜(右高左低): " + angle + "°");
+
 					drawLine(face.vertices[points[0]], face.vertices[points[0] + 1],
 						face.vertices[points[1]], face.vertices[points[1] + 1]);
 					drawLine(face.vertices[points[2]], face.vertices[points[2] + 1],
@@ -188,37 +209,37 @@ function drawLine(p0_x, p0_y, p1_x, p1_y){
 	contxt.stroke();
 }
 
-function uploadResults(){
-	$.ajax({
-	    type: "POST",
-	    url: "/uploadResults",
-			contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      data: JSON.stringify({deg1: deg1, deg2: deg2}),
-	    success: function(data){
-
-			},
-	    failure: function(errMsg) {
-	        alert(errMsg);
-	    }
-	});
-}
-
 var final_transcript = '';
 var recognizing = false;
 var ignore_onend;
+var duration;
 
 $('#next').click(function(){
 	$('#next').hide();
 	$('#imageDetect').hide();
 	$('#speechTest').show();
+	generateText();
+
+	var microm = new Microm();
+	microm.on('loadedmetadata', onLoaded);
 
 	if ('webkitSpeechRecognition' in window) {
+		console.log('version accepted!');
 		var recognition = new webkitSpeechRecognition();
 		recognition.continuous = true;
 		recognition.interimResults = true;
+		recognition.lang = "cmn-Hant-TW";
+		final_span.innerHTML = '';
+		interim_span.innerHTML = '';
+
 		recognition.onresult = function(event) {
 	    var interim_transcript = '';
+			if(typeof(event.results) == 'undefined'){
+		    	console.log('undefined');
+		    	recognition.onend = null;
+		    	recognition.stop();
+		    	return;
+		   }
 	    for (var i = event.resultIndex; i < event.results.length; ++i) {
 	      if (event.results[i].isFinal) {
 	        final_transcript += event.results[i][0].transcript;
@@ -227,8 +248,8 @@ $('#next').click(function(){
 	    	}
 	  	}
 	    final_transcript = capitalize(final_transcript);
-	    $('#final_span').html = linebreak(final_transcript);
-	    $('#interim_span').html = linebreak(interim_transcript);
+	    $('#final_span').html(linebreak(final_transcript));
+	    $('#interim_span').html(linebreak(interim_transcript));
 	  };
 		recognition.onstart = function() {
 	    recognizing = true;
@@ -236,13 +257,23 @@ $('#next').click(function(){
 
 		recognition.onerror = function(event) {
 	    console.log(event.error);
+			ignore_onend = true;
 	  };
 
 	  recognition.onend = function() {
 	    recognizing = false;
+			if(ignore_onend){
+				return;
+			}
+			if (window.getSelection) {
+      	window.getSelection().removeAllRanges();
+      	var range = document.createRange();
+      	range.selectNode(document.getElementById('final_span'));
+      	window.getSelection().addRange(range);
+    	}
 	  };
 	} else{
-		$('#results').html('您的瀏覽器無法支援，請更新瀏覽器至最新版！')
+		alert('您的瀏覽器無法支援，請更新瀏覽器至最新版！');
 	}
 
 	var two_line = /\n\n/g;
@@ -256,16 +287,110 @@ $('#next').click(function(){
 	}
 
 	$('#start_button').click(function(event){
-		if (recognizing) {
-			recognition.stop();
-			return;
-		}
+		$('#stop_button').show();
+		$('#start_button').hide();
+		$('#pause_button').hide();
+		$('#play_button').hide();
+
+		start();
 
 		final_transcript = '';
-		recognition.start();
-		ignore_onend = false;
-		recognition.lang = "cmn-Hant-TW";
-		final_span.innerHTML = '';
-		interim_span.innerHTML = '';
+  	recognition.lang = "zh-TW";
+  	recognition.start();
+  	ignore_onend = false;
+  	$('#final_span').html('');
+		$('#interim_span').html('');
+  	$('#start_button').attr("disabled", true);
+		$('#stop_button_button').attr("disabled", false);
 	});
+
+	$('#stop_button').click(function (event){
+		$('#start_button').show();
+		$('#start_button').text('重新錄音');
+		$('#stop_button').hide();
+		$('#sendResults').show();
+		$('#play_button').show();
+
+		stop();
+		recognition.stop();
+
+		$('#start_button').attr("disabled", false);
+		$('#stop_button_button').attr("disabled", true);
+	});
+
+	$('#play_button').click(function(){
+		microm.play();
+		$('#pause_button').show();
+	});
+
+	$('#pause_button').click(function(){
+		microm.pause();
+	});
+
+	function start() {
+	  microm.record().then(function() {
+	    console.log('recording...')
+	  }).catch(function() {
+	    console.log('error recording');
+	  });
+	}
+
+	function stop() {
+	  microm.stop().then(function(result) {
+	  });
+	}
+
+	function onLoaded(time) {
+		duration = time;
+	  console.log(duration);
+	}
+
+	$('#sendResults').click(function(){
+		microm.getBase64().then(function(base64string) {
+			var audio_base64 = base64string.replace('data:audio/mp3;base64,', '');
+			audioText = $('#final_span').text();
+		 $.ajax({
+		    type: 'POST',
+				url: '/strokeTest/uploadResults',
+		    contentType: 'application/json; charset=utf-8',
+				dataType: "json",
+				data: JSON.stringify({img: img_base64, angle: angle, landmarks: landmarks, audio: audio_base64, duration: duration, audioText: audioText, sampleTextID: sampleTextID, sampleText: sampleText}),
+		    success: function(data){
+					$('#speechTest').hide();
+					$('#testComplete').show();
+
+					if(angle < 0) $('#resultAngle').text('順時針傾斜(左高右低) ' + Math.abs(angle) + "°");
+					else $('#resultAngle').text("逆時針傾斜(右高左低) " + angle + "°");
+					$('#resultAccuracy').text(data.speechAccuracy);
+				},
+				failure: function(errMsg) {
+		      alert(errMsg);
+		    }
+		  });
+		});
+	});
+});
+
+function generateText(){
+	$.ajax({
+    type: "GET",
+    url: "/strokeTest/generateText",
+    dataType: "json",
+    success: function(data){
+			sampleTextID = data.SampleTextID;
+			$('#plainText').text(data.text);
+			sampleText = data.text;
+		},
+    failure: function(errMsg) {
+        alert(errMsg);
+    }
+	});
+}
+
+$('#testAgain').click(function(){
+	$('#testComplete').hide();
+	$('#imageDetect').show();
+	$('#results').html("");
+	var imageDataCtx = imageData.getContext("2d");
+	imageDataCtx.clearRect(0, 0, 640, 480);
 });

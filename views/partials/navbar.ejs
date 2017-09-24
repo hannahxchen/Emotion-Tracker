@@ -12,15 +12,19 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li><a href="/"><i class="fa fa-fw fa-home"></i>首頁</a></li>
-        <li><a href="/faceDetect/tracker"><i class="fa fa-fw fa-video-camera"></i>開始監測</a></li>
+        <!--<li><a href="/faceDetect/tracker"><i class="fa fa-fw fa-video-camera"></i>開始監測</a></li>-->
         <li><a href="/magicMirror"><i class="fa fa-fw fa-video-camera"></i>情緒魔鏡</a></li>
 
         <% if(user) {%>
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-eyedropper"></i>中風檢測<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="/strokeTest"><i class="fa fa-fw fa-history"></i>開始檢測</a></li>
-            <li><a href="#"><i class="fa fa-fw fa-history"></i>檢測結果</a></li>
+            <li><a href="/strokeTest">開始檢測</a></li>
+            <li><a href="#">檢測結果</a></li>
+            <% if(role=='admin') {%>
+            <li role="separator" class="divider"></li>
+            <li><a href="/strokeTest/manage">管理文檔</a></li>
+            <% } %>
           </ul>
         </li>
         <li class="dropdown">

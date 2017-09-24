@@ -1,0 +1,37 @@
+<% include partials/head %>
+    <title>腦中風文本管理</title>
+  </head>
+  <body>
+    <% include partials/navbar %>
+    <div class="container">
+      <% if (success_msg) {%>
+        <div class="alert alert-success"><%= success_msg %></div>
+      <% } %>
+      <% if (error_msg) {%>
+        <div class="alert alert-danger"><%= error_msg %></div>
+      <% } %>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-1" id="createSampleText">新增文本</button>
+      <div class="modal fade" id="modal-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h2 class="text-left"><b>新增文本</b></h2>
+            </div>
+            <div class="modal-body">
+              <form method="post" action="/strokeTest/createSampleText" id="sampleText">
+                <div class = "form-group">
+                  <label> 文字內容 (文字長度必須為10 ~ 50字)</label><br>
+                  <textarea rows="5" cols="50" name="text" form="sampleText"></textarea>
+                </div>
+                <button id="submit" type="submit" class="btn btn-default" style="margin-left: 300px; margin-bottom:10px;">新增</button>
+            <div class="modal-footer">
+              <a href="" class="btn btn-default" data-dismiss="modal">Close</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% include partials/footer %>
+  </body>
+</html>

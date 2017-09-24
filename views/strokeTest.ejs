@@ -3,27 +3,28 @@
 <script async src="/js/libs/brf/BRFv4_JS_trial.js"></script>
 <!--<script src="https://download.affectiva.com/js/3.1/affdex.js"></script>-->
 <script type="text/javascript" src="/js/libs/webcamjs/webcam.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/js/libs/microm/dist/microm.min.js"></script>
 <style type="text/css">
-		#my_camera{
+		#my_camera {
   		margin-right: auto;
   		margin-left: auto;
 		}
 
-		#image_canvas{
+		#image_canvas {
 			margin: auto;
   		display: block;
 		}
 
 		#imageDetect,
-		#speechTest{
+		#speechTest,
+		#testComplete {
 			padding-top: 60px;
 			padding-left: 40px;
 		}
 
 		#shot,
 		#reshot,
-		#submit_photo{
+		#submit_photo {
   		display: flex;
   		justify-content: center;
 		}
@@ -70,16 +71,28 @@
   </div>
 
 	<div id="speechTest" style="display: none; align-items: center;">
-		<div class="col-md-6" id="plainText"></div>
+		<div class="col-md-6">
+			<h3>請按下右下方的開始錄音鍵後，念出以下的文字：</h3>
+			<h5>(當您完成錄音後請按下停止錄音鍵並送出)</h4><br>
+			<span  id="plainText"></span>
+		</div>
 		<div class="col-md-6" id="recordArea" style="padding-right: 40px;">
 			<div id="speechResults">
 		  	<span id="final_span" class="final"></span>
-		  	<span id="interim_span" class="interim"></span>
+		  	<span id="interim_span" style="color:grey" class="interim"></span>
 			</div>
-			<button class="btn btn-default" id="start_button"><i class="fa fa-fw fa-microphone" aria-hidden="true"></i></a>
-			<br>
-			<button class="btn btn-primary" id="sendAudio" style="display: none;">送出</button>
+			<button class="btn btn-default" id="start_button">開始錄音<i class="fa fa-fw fa-microphone" aria-hidden="true"></i></button>
+			<button class="btn btn-default" id="stop_button" style="display: none;">停止錄音<i class="fa fa-fw fa-stop" aria-hidden="true"></i></button>
+			<button class="btn btn-default" id="play_button" style="display: none;">播放<i class="fa fa-fw fa-play" aria-hidden="true"></i></button>
+			<button class="btn btn-default" id="pause_button" style="display: none;">暫停<i class="fa fa-fw fa-pause" aria-hidden="true"></i></button>
+			<button class="btn btn-primary" id="sendResults" style="display: none; float: right;">送出</button>
 		</div>
+	</div>
+	<div id="testComplete" style="display: none; align-items: center;">
+		<h3>檢測結果</h3><br>
+		<h4>嘴巴歪斜程度：</h4><span id="resultAngle"></span>
+		<h4>咬字正確率：</h4><span id="resultAccuracy"></span><br>
+		<button class="btn btn-primary" id="testAgain" style="margin-top: 50px;">重新檢測</button>
 	</div>
 
   <script type="text/javascript" src="/js/stroke.js"></script>
