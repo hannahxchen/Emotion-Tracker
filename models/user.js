@@ -43,6 +43,11 @@ UserSchema.virtual('latest_picture', {
 	justOne: true
 });
 
+/*UserSchema.virtual('activities', {
+	ref: 'Enroll',
+	localField
+})*/
+
 
 autoIncrement.initialize(mongoose.connection);
 UserSchema.plugin(autoIncrement.plugin, { model: 'User', prefix: prefix, field: 'userID'});

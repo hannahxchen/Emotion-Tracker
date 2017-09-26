@@ -23,5 +23,5 @@ autoIncrement.initialize(mongoose.connection);
 TrackSchema.plugin(autoIncrement.plugin, { model: 'Track', prefix: track_prefix , field: 'trackID'});
 EnvFactorSchema.plugin(autoIncrement.plugin, { model: 'EnvironmentalFactor', prefix: factor_prefix, field: 'envFactorID' });
 
-var Track = module.exports = mongoose.model('Track', TrackSchema);
-var EnvironmentalFactor = module.exports = mongoose.model('EnvironmentalFactor', EnvFactorSchema);
+var Track = module.exports.Track = mongoose.model('Track', TrackSchema);
+var EnvironmentalFactor = module.exports.EnvFactor = mongoose.model('EnvironmentalFactor', EnvFactorSchema);

@@ -17,5 +17,5 @@ autoIncrement.initialize(mongoose.connection);
 RaspberryPiSchema.plugin(autoIncrement.plugin, { model: 'RaspberryPi', prefix: rpi_prefix, field: 'rpiID' });
 SensorSchema.plugin(autoIncrement.plugin, { model: 'Sensor', prefix: sensor_prefix, field: 'sensorID' });
 
-var RaspberryPi = module.exports = mongoose.model('RaspberryPi', RaspberryPiSchema);
-var Sensor = module.exports = mongoose.model('Sensor', SensorSchema);
+var RaspberryPi = module.exports.RaspberryPi = mongoose.model('RaspberryPi', RaspberryPiSchema);
+var Sensor = module.exports.Sensor = mongoose.model('Sensor', SensorSchema);

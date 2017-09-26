@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var Token = require('../models/token');
 var User = require('../models/user');
-var Face = require('../models/face');
 var Image = require('../models/image').Image;
 var ProfilePic = require('../models/image').ProfilePic;
 var kairos = require('../API/kairos');

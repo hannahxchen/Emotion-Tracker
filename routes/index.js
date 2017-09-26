@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var User = require('../models/user');
-var Face = require('../models/face');
 var kairos = require('../API/kairos');
 var moment = require('moment');
 var gallery = require('../config/kairos_api').gallery;
@@ -14,7 +13,7 @@ function ensureAuthenticated(req, res, next){
 	if(req.isAuthenticated()){
 		return next();
 	} else {
-		//req.flash('error_msg','您還尚未登入！');
+		req.flash('error_msg','您還尚未登入！');
 		res.redirect('/login');
 	}
 }
@@ -39,9 +38,7 @@ router.post('/register', function(req, res){
 	var password = req.body.password;
 	var password2 = req.body.password2;
 	var img_error = '';
-	var shot = req.body.ifshot;
-	var img;
-	console.log(shot);
+	var img = req.body.img;
 
 	// Validation
 	req.checkBody('name', '請輸入姓名').notEmpty();
@@ -54,22 +51,14 @@ router.post('/register', function(req, res){
 	req.checkBody('password', '請輸入密碼').notEmpty();
 	req.checkBody('password2', '確認密碼錯誤').equals(req.body.password);
 
-	if(shot == "false"){
-		console.log('no profile pic');
-		img_error = '請拍張個人照';
-	}else{
-		img = req.body.img;
-	}
-
 	var errors = req.validationErrors();
 
-	if(errors || !shot){
+	if(errors){
 		errors.forEach(function(error){
 			console.log(error.msg);
 		});
 		res.render('register',{
 			errors:errors,
-			img_error:img_error
 		});
 	} else {
 		var newUser = new User({

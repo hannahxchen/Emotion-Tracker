@@ -1,4 +1,4 @@
-var express = require('express');
+/*var express = require('express');
 var router = express.Router();
 var Face = require('../models/face');
 
@@ -26,4 +26,4 @@ router.post('/clearData', function(req, res){
   res.redirect('/faceDetect/trackerData');
 });
 
-module.exports = router;
+module.exports = router;*/

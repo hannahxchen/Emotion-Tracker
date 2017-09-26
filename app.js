@@ -35,7 +35,6 @@ require('./sockets')(io);
 console.log('Server running on port : ' + port );
 
 var routes = require('./routes/index');
-var faceDetect = require('./routes/faceDetect');
 var api = require('./routes/api');
 //var imageFile = require('./routes/imageFile');
 var activity = require('./routes/activity');
@@ -102,10 +101,9 @@ app.use(function (req, res, next) {
 });
 
 app.use('/', routes);
-app.use('/faceDetect', faceDetect);
 app.use('/api', api);
 //app.use('/photoAlbum', imageFile);
-app.use('/activities', activity);
+app.use('/activity', activity);
 app.use('/photos', photos);
 app.use('/videos', videos);
 app.use('/strokeTest', strokeTest);

@@ -1,7 +1,5 @@
 var kairos = require('./API/kairos');
 var mongoose = require('mongoose');
-var Face = require('./models/face');
-var SubFace = require('./models/subFace');
 var User = require('./models/user');
 var faceDetect = require('./routes/faceDetect');
 var kairos = require('./API/kairos');
@@ -52,7 +50,7 @@ module.exports=function(io){
 			});
 		});
 
-			socket.on('face-data', function(data){
+			/*socket.on('face-data', function(data){
 				if(kairos.status == "failure"){
 					var query = {username: User.visitorUsername};
 					var newSubFace = new SubFace({emotion: data.emotion, appearance: data.appearance,
@@ -104,7 +102,7 @@ module.exports=function(io){
 
 					socket.on('push data start', function(start){
 						if(start == true) socket.emit('getUsername', faceDetect.username);
-		});
+		});*/
 
 		socket.on('hueIP', function(hueIP){
 			var host = hueIP;

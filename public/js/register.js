@@ -14,11 +14,11 @@ $(document).ready(function(){
     if(shot){
       Webcam.snap( function(data_uri) {
         $('#img').val(data_uri.replace('data:image/jpeg;base64,', ''));
-        $('#ifshot').val(shot);
       });
     }
     else{
-      $('#ifshot').val(shot);
+			event.preventDefault();
+			alert('請拍張個人照！');
     }
 	});
 
