@@ -55,10 +55,11 @@ var ActivityType = module.exports.ActivityType = mongoose.model('ActivityType', 
 var Enroll = module.exports.Enroll = mongoose.model('Enroll', EnrollSchema);
 
 module.exports.createActivity = function createActivity(data, path, userID){
-  var start = moment(data.startDate + ' ' + data.startTime, 'YYYY-MM-DD HH:mm');
-  var end = moment(data.endDate + ' ' + data.endTime, 'YYYY-MM-DD HH:mm');
-  var deadLine = moment(data.deadLineDate + ' ' + data.deadLineTime, 'YYYY-MM-DD HH:mm');
+  var start = moment(data.startDate + ' ' + data.startTime);
+  var end = moment(data.endDate + ' ' + data.endTime);
+  var deadLine = moment(data.deadLineDate + ' ' + data.deadLineTime);
   var contact = {tel: data.tel, email: data.email};
+  var img_path = path.replace("./uploads", "");
   ActivityType.findOne({type: data.type}, function(err, type){
     var newActivity = new Activity({
       title: data.title,
@@ -75,7 +76,7 @@ module.exports.createActivity = function createActivity(data, path, userID){
       host: data.host,
       coHost: data.coHost,
       activityType_id: type.activityTypeID,
-      coverPhoto_path: path,
+      coverPhoto_path: img_path,
     });
 
     newActivity.save(function(err, doc){

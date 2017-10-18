@@ -4,6 +4,8 @@ var Token = require('../models/token');
 var User = require('../models/user');
 var Image = require('../models/image').Image;
 var ProfilePic = require('../models/image').ProfilePic;
+var ActivityType = require('../models/activity').ActivityType;
+var Activity = require('../models/activity').Activity;
 var kairos = require('../API/kairos');
 var moment = require('moment');
 
@@ -64,7 +66,7 @@ router.post('/userAuthenticate', function(req, res){
     if(!req.body.username || !req.body.password){
       res.json({success:false, message: 'Authentication failed. Missing parameters!'});
     }
-    User.getUserByUsername(req.body.username, function(err, user){
+    User.findOne({username: req.body.username}, function(err, user){
       if(err) throw err;
       if(!user){
         res.json({success:false, message: 'Authentication failed. User not found!'});
@@ -135,6 +137,23 @@ router.post('/detect', function(req, res){
     }
     else if (status == 'success'){
       res.json({age: age, glasses: glasses});
+    }
+  });
+});
+
+router.get('/activityTypes', function(req, res){
+  Token.findToken(req.headers.key, function(err, key){
+    if(err) throw err;
+    if(!key) res.json({success: false, message: 'Authentication failed. Token key not found.'});
+    else{
+      ActivityType.find({}, function(err, docs){
+        if(err) throw err;
+        var types = [];
+        docs.forEach(function(element){
+          types.push(element.type);
+        });
+        res.json({types: types});
+    	});
     }
   });
 });

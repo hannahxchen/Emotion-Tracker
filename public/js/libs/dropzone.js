@@ -1169,6 +1169,14 @@
       }
       img.onload = (function(_this) {
         return function() {
+          var orientation = 0;
+          EXIF.getData(img, function() {
+            switch(parseInt(EXIF.getTag(this, "Orientation"))){
+              case 3: orientation = 180; break;
+              case 6: orientation = -90; break;
+              case 8: orientation = 90; break;
+            }
+          });
           var loadExif;
           loadExif = function(callback) {
             return callback(1);
@@ -1223,7 +1231,7 @@
                 ctx.rotate(-0.5 * Math.PI);
                 ctx.translate(-canvas.width, 0);
             }
-            drawImageIOSFix(ctx, img, (ref = resizeInfo.srcX) != null ? ref : 0, (ref1 = resizeInfo.srcY) != null ? ref1 : 0, resizeInfo.srcWidth, resizeInfo.srcHeight, (ref2 = resizeInfo.trgX) != null ? ref2 : 0, (ref3 = resizeInfo.trgY) != null ? ref3 : 0, resizeInfo.trgWidth, resizeInfo.trgHeight);
+            drawImageIOSFix(orientation, ctx, img, (ref = resizeInfo.srcX) != null ? ref : 0, (ref1 = resizeInfo.srcY) != null ? ref1 : 0, resizeInfo.srcWidth, resizeInfo.srcHeight, (ref2 = resizeInfo.trgX) != null ? ref2 : 0, (ref3 = resizeInfo.trgY) != null ? ref3 : 0, resizeInfo.trgWidth, resizeInfo.trgHeight);
             thumbnail = canvas.toDataURL("image/png");
             if (callback != null) {
               return callback(thumbnail, canvas);
@@ -1822,9 +1830,14 @@
     }
   };
 
-  drawImageIOSFix = function(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
+  drawImageIOSFix = function(o, ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
     var vertSquashRatio;
     vertSquashRatio = detectVerticalSquash(img);
+    dh = dh / vertSquashRatio;
+    ctx.translate( dx+dw/2, dy+dh/2 );
+    ctx.rotate(o*Math.PI/180);
+    dx = -dw/2;
+    dy = -dh/2;
     return ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh / vertSquashRatio);
   };
 

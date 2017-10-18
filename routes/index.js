@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
-var User = require('../models/user');
+var User = require('../models/user').User;
+var user_ = require('../models/user');
 var kairos = require('../API/kairos');
 var moment = require('moment');
 var gallery = require('../config/kairos_api').gallery;
@@ -71,7 +72,7 @@ router.post('/register', function(req, res){
 			gender: gender
 		});
 
-		var response = User.createUser(newUser, img, function(err, user){
+		var response = user_.createUser(newUser, img, function(err, user){
 			if(err) throw err;
 			else console.log(user);
 		});

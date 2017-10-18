@@ -1,0 +1,13 @@
+<% include partials/head %>
+    <title>我的活動</title>
+  </head>
+  <body>
+    <% include partials/navbar %>
+    <div class="container">
+      <% if (user) {%>
+      <h2>Welcome back <%= user.name %>!</h2>
+      <% } %>
+    </div>
+    <% include partials/footer %>
+  </body>
+</html>

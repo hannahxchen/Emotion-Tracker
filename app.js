@@ -39,7 +39,6 @@ var api = require('./routes/api');
 //var imageFile = require('./routes/imageFile');
 var activity = require('./routes/activity');
 var hueLight = require('./routes/hueLight');
-var videos = require('./routes/videos');
 var photos = require('./routes/photos');
 var admin = require('./routes/admin');
 var strokeTest = require('./routes/strokeTest');
@@ -49,6 +48,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'uploads')));
 
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(logger('dev'));
@@ -105,7 +105,6 @@ app.use('/api', api);
 //app.use('/photoAlbum', imageFile);
 app.use('/activity', activity);
 app.use('/photos', photos);
-app.use('/videos', videos);
 app.use('/strokeTest', strokeTest);
 app.use('/admin', admin);
 app.use('/hueLight', hueLight);

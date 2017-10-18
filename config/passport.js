@@ -1,5 +1,6 @@
 var LocalStrategy = require('passport-local').Strategy;
-var User = require('../models/user');
+var User = require('../models/user').User;
+var user_ = require('../models/user');
 var mongoose = require('mongoose');
 
 module.exports = function(passport) {
@@ -25,7 +26,7 @@ module.exports = function(passport) {
         return done(null, false, {message: 'Unknown User'});
       }
 
-      User.validPassword(password, user.password, function(err, isMatch){
+      user_.validPassword(password, user.password, function(err, isMatch){
         if(err) throw err;
         if(isMatch){
           return done(null, user);

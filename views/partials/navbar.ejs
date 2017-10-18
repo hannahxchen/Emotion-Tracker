@@ -17,50 +17,32 @@
         <li><a href="/hueLight"><i class="fa fa-fw fa-lightbulb-o"></i>Philips Hue</a></li>
 
         <% if(user) {%>
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-eyedropper"></i>中風檢測<span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="/strokeTest">開始檢測</a></li>
-            <li><a href="#">檢測結果</a></li>
-            <% if(role=='admin') {%>
-            <li role="separator" class="divider"></li>
-            <li><a href="/strokeTest/manage">管理文檔</a></li>
-            <% } %>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-gamepad"></i>活動平台<span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#"><i class="fa fa-fw fa-fire"></i>熱門活動</a></li>
-            <li><a href="#"><i class="fa fa-fw fa-calendar"></i>我的活動</a></li>
-            <% if(role=='admin') {%>
-            <li role="separator" class="divider"></li>
-            <li><a href="/activity/upload"><i class="fa fa-fw fa-plus-square-o"></i>上架活動</a></li>
-            <% } %>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-picture-o"></i>相片平台<span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="/photos"><i class="fa fa-fw fa-history"></i>照片動態</a></li>
-            <li><a href="#"><i class="fa fa-fw fa-history"></i>家庭相簿</a></li>
-            <li><a href="#"><i class="fa fa-fw fa-history"></i>活動相簿</a></li>
-            <li><a href="#"><i class="fa fa-fw fa-history"></i>我的社交圈</a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-picture-o"></i>影片平台<span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="/videos"><i class="fa fa-fw fa-history"></i>影片動態</a></li>
-            <li><a href="#"><i class="fa fa-fw fa-history"></i>我的頻道</a></li>
-            <li><a href="#"><i class="fa fa-fw fa-history"></i>家庭頻道</a></li>
-          </ul>
-        </li>
-        <li><a href="/hueLight"><i class="fa fa-fw fa-lightbulb-o"></i>Philips Hue</a></li>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-eyedropper"></i>中風檢測<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="/strokeTest">開始檢測</a></li>
+              <li><a href="#">檢測結果</a></li>
+              <% if(role=='admin') {%>
+              <li role="separator" class="divider"></li>
+              <li><a href="/strokeTest/manage">管理文檔</a></li>
+              <% } %>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-gamepad"></i>活動平台<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="/activity"><i class="fa fa-fw fa-fire"></i>熱門活動</a></li>
+              <li><a href="/activity/all"><i class="fa fa-fw fa-calendar"></i>所有活動</a></li>
+              <li><a href="/activity/myCalendar"><i class="fa fa-fw fa-calendar"></i>我的活動</a></li>
+              <% if(role=='admin') {%>
+              <li role="separator" class="divider"></li>
+              <li><a href="/activity/upload"><i class="fa fa-fw fa-plus-square-o"></i>上架活動</a></li>
+              <% } %>
+            </ul>
+          </li>
+          <li><a href="/photos"><i class="fa fa-fw fa-picture-o"></i>我的相簿</a></li>
         <% } %>
         <% if(role=='admin') {%>
-          <li><a href="/faceDetect/monitor"><i class="fa fa-fw fa-area-chart"></i>監測數據</a></li>
-          <li><a href="/faceDetect/visitors"><i class="fa fa-fw fa-handshake-o"></i>訪客管理</a></li>
         <% } %>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -68,7 +50,6 @@
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-user-circle"></i><%= user.name %><span class="caret"></span></a>
             <ul class="dropdown-menu">
-              <li><a href="/faceDetect/trackerData"><i class="fa fa-fw fa-television"></i>監測結果</a></li>
               <li><a href="/profile"><i class="fa fa-fw fa-user"></i>個人資料</a></li>
               <li role="separator" class="divider"></li>
               <li><a href="#"><i class="fa fa-fw fa-cog"></i>設定</a></li>

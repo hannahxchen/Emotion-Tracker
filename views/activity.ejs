@@ -1,11 +1,165 @@
 <% include partials/head %>
     <title>熱門活動</title>
+    <link rel="stylesheet" href="/css/activity.css">
   </head>
   <body>
     <% include partials/navbar %>
     <div class="container">
-      
+      <div id="myCarousel" class="carousel slide" data-ride="carousel">
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner">
+          <% latest.forEach(function(element){ %>
+            <div class="item">
+              <img src="<%= element.coverPhoto_path %>" alt="<%= element.title %>">
+              <div class="carousel-caption">
+                <h3><%= element.title %></h3>
+                <p><%= element.content %></p>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        <ul class="nav nav-pills nav-justified">
+          <li data-target="#myCarousel" data-slide-to="0" class="active"><a href="#"><%= latest[0].title %><small><%= latest[0].content %></small></a></li>
+          <li data-target="#myCarousel" data-slide-to="1"><a href="#"><%= latest[1].title %><small><%= latest[1].content %></small></a></li>
+          <li data-target="#myCarousel" data-slide-to="2"><a href="#"><%= latest[2].title %><small><%= latest[2].content %></small></a></li>
+        </ul>
+      </div>
+
+      <div class="row" id="activity-tabs">
+        <div class="col-lg-3">
+          <div class="panel panel-primary">
+            <div class="panel-heading">搜尋所有活動</div>
+            <div class="panel-body">
+              <div class="input-group" id="custom-search-input">
+                <input type="text" class="search-query form-control" placeholder="請輸入關鍵字" />
+                <span class="input-group-btn">
+                  <button class="btn btn-danger">
+                    <span class=" glyphicon glyphicon-search"></span>
+                  </button>
+                </span>
+              </div>
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label for="type" class="control-label">活動類型</label>
+                  <select class="form-control" name="" id="type">
+                    <option value="any">請選擇</option>
+                    <% types.forEach(function(element){ %>
+                      <option value="<%= element %>"><%= element %></option>
+                    <% }); %>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="sort" class="control-label">排序方式</label>
+                  <select class="form-control" name="" id="sort">
+                    <option value="popular">熱門（高→低）</option>
+                    <option value="unpopular">熱門（低→高）</option>
+                    <option value="latest">時間（新→舊）</option>
+                    <option value="old">時間（舊→新）</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading">所有類別</div>
+            <div class="panel-body">
+              <ul class="nav type-list">
+                <% types.forEach(function(element){ %>
+                  <li><a href="#"><%= element %></a></li>
+                <% }); %>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-9">
+          <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#recommend">推薦活動</a></li>
+            <li><a data-toggle="tab" href="#subscribed">我的訂閱</a></li>
+            <li><a data-toggle="tab" href="#latest">最新活動</a></li>
+            <li><a data-toggle="tab" href="#popular">熱門活動</a></li>
+          </ul>
+
+          <div class="tab-content">
+            <div id="recommend" class="tab-pane in active">
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="col-item">
+                    <div class="photo"><img src="http://placehold.it/350x260" class="img-responsive" alt="a" /></div>
+                    <div class="info">
+                      <div class="row">
+                        <h5 id="activity-title">活動名稱</h5>
+                        <h5 id="activity-datetime">2017/09/27</h5>
+                      </div>
+                      <div class="separator clear-left">
+                        <p class="btn-register"><button id="register" class="btn btn-primary">我要報名</button></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="subscribed" class="tab-pane">
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="col-item">
+                    <div class="photo"><img src="http://placehold.it/350x260" class="img-responsive" alt="a" /></div>
+                    <div class="info">
+                      <div class="row">
+                        <h5 id="activity-title">活動名稱</h5>
+                        <h5 id="activity-datetime">2017/09/27</h5>
+                      </div>
+                      <div class="separator clear-left">
+                        <p class="btn-register"><button id="register" class="btn btn-primary">我要報名</button></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="latest" class="tab-pane">
+              <div class="row">
+                <% latest.forEach(function(element){ %>
+                  <div class="col-sm-4">
+                    <div class="col-item">
+                      <div class="photo"><img src="<%= element.coverPhoto_path %>" class="img-responsive" alt="<%= element.title %>"/></div>
+                      <div class="info">
+                        <div class="row">
+                          <h5 id="activity-title"><%= element.title %></h5>
+                          <h5 id="activity-datetime"><%= moment(element.startTime).format('YYYY/MM/DD HH:mm')%> ~ <%= moment(element.endTime).format('YYYY/MM/DD HH:mm')%></h5>
+                        </div>
+                        <div class="separator clear-left">
+                          <p class="btn-register"><button id="register" class="btn btn-primary">我要報名</button></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+            <div id="popular" class="tab-pane">
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="col-item">
+                    <div class="photo"><img src="http://placehold.it/350x260" class="img-responsive" alt="a" /></div>
+                    <div class="info">
+                      <div class="row">
+                        <h5 id="activity-title">活動名稱</h5>
+                        <h5 id="activity-datetime">2017/09/27</h5>
+                      </div>
+                      <div class="separator clear-left">
+                        <p class="btn-register"><button id="register" class="btn btn-primary">我要報名</button></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+    <script type="text/javascript" src="/js/activity-home.js"></script>
     <% include partials/footer %>
   </body>
 </html>

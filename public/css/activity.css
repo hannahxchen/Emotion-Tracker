@@ -1,0 +1,129 @@
+.container {
+  margin: 0 auto;
+  margin-top: 60px;
+}
+
+.carousel-inner > .item > img {
+  margin: auto;
+  width: 400px;
+  height: 300px;
+}
+
+#myCarousel .nav a small {
+  display:block;
+}
+
+#myCarousel .nav {
+	background:#eee;
+}
+
+#myCarousel .nav a {
+  border-radius:0px;
+}
+
+#custom-search-input {
+  margin:0;
+  padding: 0;
+}
+
+#custom-search-input .search-query {
+  padding-right: 5px;
+  padding-right: 5px \9;
+  padding-left: 5px;
+  padding-left: 5px \9;
+  /* IE7-8 doesn't have border-radius, so don't indent the padding */
+
+  margin-bottom: 0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+#custom-search-input button {
+  border: 0;
+  background: none;
+  padding: 2px 5px;
+  margin-top: 2px;
+  position: relative;
+  left: -28px;
+  margin-bottom: 0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  color:#D9230F;
+}
+
+.search-query:focus + button {
+  z-index: 3000;
+}
+
+.form-horizontal {
+  margin-top: 10px;
+  margin-left: 15px;
+  margin-right: 20px;
+}
+
+.type-list {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.tab-content {
+    border: 1px solid #ddd;
+    border-width: 0 1px 1px;
+    padding: 10px 20px 10px 20px;
+}
+
+#activity-tabs {
+  margin-top: 50px;
+}
+
+.nav-tabs>li>a:focus {
+  background-color: transparent;
+}
+
+.col-item {
+  border: 1px solid #E1E1E1;
+  border-radius: 5px;
+  background: #FFF;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.col-item .photo img {
+  width: 100%;
+  height: auto;
+}
+
+.col-item .photo {
+  margin: 0 auto;
+  width: 220px;
+  height: 150px;
+  overflow: hidden;
+}
+
+.col-item .info {
+  padding: 10px;
+  border-radius: 0 0 5px 5px;
+  margin-top: 1px;
+}
+
+#activity-title {
+  margin-top: 3px;
+}
+
+.col-item .activity-title h5 {
+  line-height: 20px;
+  margin: 0;
+}
+
+.col-item .separator {
+  border-top: 1px solid #E1E1E1;
+}
+
+.col-item .separator p {
+  line-height: 20px;
+  margin-bottom: 0;
+  margin-top: 10px;
+  text-align: center;
+}

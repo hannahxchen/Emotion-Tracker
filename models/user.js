@@ -52,7 +52,7 @@ UserSchema.virtual('latest_picture', {
 autoIncrement.initialize(mongoose.connection);
 UserSchema.plugin(autoIncrement.plugin, { model: 'User', prefix: prefix, field: 'userID'});
 
-var User = module.exports = mongoose.model('User', UserSchema);
+var User = module.exports.User = mongoose.model('User', UserSchema);
 
 module.exports.createUser = function(newUser, img, callback){
 	var res = {};
@@ -66,7 +66,7 @@ module.exports.createUser = function(newUser, img, callback){
 					newAppearnce.glasses = false;
 				else
 					newAppearnce.glasses = true;
-				img_function.saveFirstAvatar(userID, img, newAppearnce, function(imgID){
+				img_function.saveAvatar(img, userID, newAppearnce, function(imgID){
 					newUser.profile_picture_id = imgID;
 					newUser.latest_picture_id = imgID;
 					bcrypt.genSalt(10, function(err, salt) {
@@ -90,8 +90,13 @@ module.exports.saveUnknown = function saveUnknown(img, callback){
 		var userID = count;
 		var newUser = new User({userID: userID, role: 'unknown'});
 		var newAppearnce = new Appearance({user_id: userID});
-		kairos.enroll(img, userID, function(status, appearance){
-      if (status == 'success'){
+		module.exports.nextUser = count;
+		kairos.enroll(img, userID, function(error, status, appearance){
+			if(error){
+				img_function.saveAvatar(img);
+				if(callback) callback(error);
+			}
+      if(status == 'success'){
 				newUser.gender = appearance.gender.type;
 				newAppearnce.age = appearance.age;
 				if(appearance.glasses == 'None')
@@ -101,19 +106,43 @@ module.exports.saveUnknown = function saveUnknown(img, callback){
 				img_function.saveAvatar(img, userID, newAppearnce, function(imgID){
 					newUser.profile_picture_id = imgID;
 					newUser.latest_picture_id = imgID;
-			    newUser.save(function(err){
+			    newUser.save(function(err, doc){
 			      if(err) throw err;
+						console.log(doc);
 			    });
 				});
 				var error = false;
 				if(callback) callback(error, userID, appearance.age);
 			}
-      else{
-				var error = true;
-				if(callback) callback(res.error);
-			}
     });
   });
+};
+
+module.exports.saveImgUnknown = function(img, imgID, callback){
+	User.nextCount(function(err, count){
+		var userID = count;
+		var newUser = new User({userID: userID, role: 'unknown', profile_picture_id: imgID, latest_picture_id: imgID});
+		var newAppearnce = new Appearance({user_id: userID, media_id: imgID});
+		kairos.enroll(img, userID, function(err, status, appearance){
+			if(err)	callback(error);
+			else if(status == 'success'){
+				newUser.gender = appearance.gender.type;
+				newAppearnce.age = appearance.age;
+				if(appearance.glasses == 'None')
+					newAppearnce.glasses = false;
+				else
+					newAppearnce.glasses = true;
+				newUser.save(function(err, doc){
+					if(err) throw err;
+					console.log(doc);
+				});
+				newAppearnce.save(function(err){
+					if(err) throw err;
+				});
+				if(callback) callback(err, userID);
+			}
+		});
+	});
 };
 
 module.exports.validPassword = function(candidatePassword, hash, callback){
@@ -127,5 +156,6 @@ module.exports.updateUser = function(query, update){
 	var options = { new: true };
 	User.findOneAndUpdate(query, update, options, function(err, doc){
 		if(err) throw err;
+		console.log(doc);
 	});
 };

@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var stringSimilarity = require('string-similarity');
-var CVATest_function = require('../models/CVATest');
+var CVATest_ = require('../models/CVATest');
 var CVAAudio = require('../models/CVATest').CVAAudio;
 var SampleText = require('../models/CVATest').SampleText;
 var CVATest = require('../models/CVATest').CVATest;
@@ -61,7 +61,7 @@ router.post('/uploadResults', function(req, res){
       if(err) throw err;
     });
 
-    Image.update({imageID: img.imageID}, {path: img_path}, function(err){});
+    Image.update({imageID: img.imageID}, {path: img_path.replace("./uploads", "")}, function(err){});
 
     CVAAudio.create({duration: req.body.duration, text: req.body.audioText, sampleText_id: req.body.sampleTextID}, function(err, audio){
       if(err) throw err;
@@ -76,7 +76,7 @@ router.post('/uploadResults', function(req, res){
       Landmark.create({user_id: req.user.userID, media_id: img.imageID, landmarks: req.body.landmarks}, function(err, doc){
         if(err) throw err;
 
-        CVATest_function.saveResults(req.user.userID, req.body.angle, accuracy, img.imageID, audio.CVAAudioID, doc.landmarkID);
+        CVATest_.saveResults(req.user.userID, req.body.angle, accuracy, img.imageID, audio.CVAAudioID, doc.landmarkID);
       });
     });
   });

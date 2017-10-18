@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
+var async = require('async');
+var moment = require('moment');
 var ActivityType = require('../models/activity').ActivityType;
+var Activity = require('../models/activity').Activity;
 var activity_function = require('../models/activity');
 var multer  =   require('multer');
 var storage =   multer.diskStorage({
@@ -14,7 +17,34 @@ var storage =   multer.diskStorage({
 var upload = multer({ storage : storage});
 
 router.get('/', function(req, res){
-  res.render('activity');
+  async.parallel({
+  	getType: function(callback){
+  		ActivityType.find({}, function(err, docs){
+  		    if(err) throw err;
+  		    var types = [];
+  		    docs.forEach(function(element){
+  		      types.push(element.type);
+  		    });
+  		    callback(null, types);
+  		});
+  	},
+  	getLatest: function(callback){
+  		Activity.find({}).sort('-createdAt').limit(3).exec(function(err, docs){
+  			if(err) throw err;
+  			callback(null, docs);
+  		});
+  	},
+  }, function(err, results){
+  	res.render('activity', {types: results.getType, latest: results.getLatest, moment: moment});
+  });
+});
+
+router.get('/myCalendar', function(req, res){
+  res.render('myCalendar');
+});
+
+router.get('/all', function(req, res){
+  res.render('activityAll');
 });
 
 router.get('/upload', function(req, res){
@@ -66,6 +96,11 @@ router.post('/upload', upload.single('coverPhoto'), function(req, res){
     });
 
   }
+});
+
+router.post('/getData', function(req, res){
+  var query = {};
+  if (req.body.activityID) query.activityID = req.body.activityID;
 });
 
 module.exports = router;

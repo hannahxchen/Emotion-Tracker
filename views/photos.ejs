@@ -1,4 +1,5 @@
 <% include partials/head %>
+<script type="text/javascript" src="/js/libs/exif.js"></script>
 <script type="text/javascript" src="/js/libs/dropzone.js"></script>
 <link href="/css/dropzone.css" rel="stylesheet">
 <title>我的相簿</title>
@@ -15,7 +16,7 @@
 <body>
   <% include partials/navbar %>
   <div class="container">
-    <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <div id="myCarousel" class="carousel slide" data-ride="carousel" style="display: none;">
       <!-- Indicators -->
       <ol class="carousel-indicators">
         <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
@@ -61,7 +62,7 @@
           <h2 class="text-left"><b>上傳照片</b></h2>
         </div>
         <div class="modal-body">
-          <form action="/photoAlbum/uploadImage" id="mydropzone" method="post" enctype="multipart/form-data" class="dropzone needsclick dz-clickable">
+          <form action="/photos/upload_v2" id="mydropzone" method="post" enctype="multipart/form-data" class="dropzone needsclick dz-clickable">
             <div class="dz-message needsclick">拖曳或點選這裡上傳照片</div>
             <div class="fallback">
               <input name="file" type="file" accept="image/*" multiple />

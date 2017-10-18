@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var kairos = require('../API/kairos');
-var User = require('../models/user.js');
+var User = require('../models/user.js').User;
+var user_ = require('../models/user.js');
 var Image = require('../models/image.js').Image;
-var img_function = require('../models/image.js');
+var img_ = require('../models/image.js');
 var Appearance = require('../models/appearance.js');
 var Calibration = require('../models/calibration.js');
 var Emotion = require('../models/emotions.js');
@@ -16,7 +17,7 @@ router.post('/recognize', function(req, res){
   kairos.recognize(req.body.image, function(error, status, userID){
     if (error) res.json({error: true});
     else if (status == 'failure'){
-      User.saveUnknown(req.body.image, function(error, userID, age){
+      user_.saveUnknown(req.body.image, function(error, userID, age){
         if(error)
           res.json({error: true});
         else
@@ -36,7 +37,7 @@ router.post('/recognize', function(req, res){
             else res.json({userID: userID, physicalAge: age});
           });
           var newAppearnce = new Appearance({user_id: userID, age: age, glasses: glasses});
-          img_function.saveAvatar(req.body.image, userID, newAppearnce, function(imgID){
+          img_.saveAvatar(req.body.image, userID, newAppearnce, function(imgID){
             User.update({userID: userID}, {latest_picture_id: imgID}, function(err){
               if(err) throw err;
             });
