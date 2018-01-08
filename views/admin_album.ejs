@@ -1,0 +1,134 @@
+<% include partials/admin_header %>
+<title>Emotion Tracker - Admin</title>
+<link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.8.1/baguetteBox.min.css">
+<link rel="stylesheet" href="/css/thumbnail-gallery.css">
+<link href="/css/dropzone.css" rel="stylesheet">
+<style>
+  .container {
+    margin-top: 50px;
+  }
+
+  .row{
+    padding-top: 40px;
+  }
+
+  .btn-group li{
+    cursor: pointer;
+  }
+
+  img {
+    image-orientation: from-image;
+  }
+
+  .img-cropper {
+    height: 0px;
+    overflow: hidden;
+    padding-bottom: 70%;
+    margin: auto;
+    text-align: center;
+  }
+  .img-cropper img {
+    max-width: 100%;
+  }
+</style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
+  <div class="wrapper">
+    <% include partials/admin_navbar %>
+    <% include partials/admin_sidebar %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          相簿管理
+          <div class="btn-group" style="margin-left: 20px;">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="background: #f4f4f4;">
+              Action <span class="fa fa-caret-down"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li id="upload"> <a data-toggle="modal" data-target="#createAlbum">Create Album</a></li>
+            </ul>
+          </div>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-picture-o"></i> Album</a></li>
+        </ol>
+      </section>
+
+      <!-- Main content -->
+      <section class="content container-fluid" style="margin-top: 10px; padding-top: 0; margin-left: 10px; margin-right: 10px;">
+
+        <% if (success_msg) {%>
+          <div class="alert alert-success"><%= success_msg %></div>
+        <% } %>
+
+        <% if (error_msg) {%>
+          <div class="alert alert-danger"><%= error_msg %></div>
+        <% } %>
+
+        <div class="modal fade" id="createAlbum">
+          <div class="modal-dialog modal-md">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="text-left"><b>新增相簿</b></h2>
+              </div>
+              <div class="modal-body">
+                <form method="post" action="/photos/newAlbum">
+                  <div class = "form-group">
+                    <label> 相簿名稱 </label>
+                    <input type="text" class="form-control" name="albumName" required="required" placeholder="名稱">
+                  </div>
+                  <div class = "form-group">
+                    <button type = "submit" class = "btn btn-primary"> 新增 </button>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <a href="" class="btn btn-default" data-dismiss="modal">Close</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <% if(albums){ %>
+          <div class="tz-gallery" style="padding-top: 0;">
+            <div class="row">
+              <% albums.forEach(function(album){ %>
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <div class="thumbnail">
+                    <a href="/admin/album/<%= album._id %>">
+                      <div class="img-cropper">
+                        <% if(album.image_list && album.image_list.length > 0) { %>
+                          <img src="<%= album.image_list[0].path %>" alt="無法顯示照片" onerror="this.src='/img/blank.png';">
+                        <% }else{ %>
+                          <img src="/img/blank.png" alt="無法顯示照片">
+                        <% } %>
+                      </div>
+                    </a>
+                    <div class="caption">
+                      <h3><a href="/admin/album/<%= album._id %>"><%= album.title %></a></h3>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        <% } %>
+
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include partials/admin_footer %>
+    <% include partials/admin_control_sidebar %>
+  </div>
+  <!-- ./wrapper -->
+  <script>
+    baguetteBox.run('.tz-gallery');
+  </script>
+
+</body>
+</html>

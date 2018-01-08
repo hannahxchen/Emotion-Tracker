@@ -1,13 +1,76 @@
 <% include partials/head %>
     <title>我的活動</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.5.1/fullcalendar.min.css">
+    <link rel="stylesheet" media="print" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.5.1/fullcalendar.print.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.5.1/fullcalendar.min.js"></script>
+    <link rel="stylesheet" href="/css/activityAll.css">
   </head>
   <body>
     <% include partials/navbar %>
     <div class="container">
-      <% if (user) {%>
-      <h2>Welcome back <%= user.name %>!</h2>
-      <% } %>
+      <span id="user_id" style="display: none;"><%= user.userID %><span>
+      <div id="calendar"></div>
     </div>
+
+    <div id="fullCalModal" class="modal fade">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span> <span class="sr-only">close</span></button>
+                  <h4 id="modalTitle" class="modal-title"></h4>
+              </div>
+              <div id="modalBody" class="modal-body"></div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <button class="btn btn-primary"><a id="eventUrl" target="_blank">活動頁面</a></button>
+              </div>
+          </div>
+      </div>
+  </div>
     <% include partials/footer %>
+    <script>
+      var today = new Date();
+      var user_id = $('#user_id').text();
+
+      $.ajax({
+        url: '/api/getActivities/'+user_id,
+        method: "GET",
+      }).done(function(response) {
+        // Parse our events into an event object for FullCalendar
+        var events = [];
+        $.each(response, function(idx, e) {
+          events.push({
+            start: moment.utc(e.start).local().format('YYYY-MM-DD HH:mm:ss'),
+            end: moment.utc(e.end).local().format('YYYY-MM-DD HH:mm:ss'),
+            title: e.title,
+            url: 'https://'+location.host+'/activity/'+e.id
+          });
+        });
+        $('#calendar').fullCalendar({
+          header: {
+            left: 'agendaDay,agendaWeek,month',
+            center: 'title',
+            right: 'prev,next today'
+          },
+          defaultDate: today.toISOString().substring(0, 10),
+          defaultView: 'month',
+        	navLinks: true,
+          editable: true,
+          selectable: true,
+          eventLimit: true,
+          events: events,
+          eventRender: function(event, element){
+
+          }
+        });
+      });
+
+
+      $('.fc-event').click(function(){
+
+      });
+
+    </script>
   </body>
 </html>

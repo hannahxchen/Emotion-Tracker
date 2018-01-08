@@ -1,4 +1,6 @@
 Dropzone.options.mydropzone = {
-  acceptedFiles: "image/jpeg,image/png,image/gif",
-  resizeWidth: 800
+  acceptedFiles: "image/jpeg",
+  //resizeWidth: 800,
+  uploadMultiple: true,
+  parallelUploads: 10000
 };

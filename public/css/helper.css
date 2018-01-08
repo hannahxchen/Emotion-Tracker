@@ -1,0 +1,79 @@
+.m-t-10 {
+  margin-top: 10px;
+}
+
+.m-b-10 {
+  margin-bottom: 10px;
+}
+
+.text-purple {
+  color: #7266ba;
+}
+
+.text-primary {
+  color: #3bafda;
+}
+
+.text-muted {
+  color: #98a6ad;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.card-box {
+  padding: 20px;
+  border: 1px solid #c2cfd6;
+  border-radius: 5px;
+  background-clip: padding-box;
+  margin-bottom: 20px;
+  background-color: #fff;
+}
+
+.waves-effect {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  overflow: hidden;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  vertical-align: middle;
+  z-index: 1;
+  will-change: opacity, transform;
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  -ms-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out
+}
+
+.bg-info {
+  background-color: rgba(45,172,209,.85);
+  color: #fff;
+}
+
+.bg-success {
+  background-color: rgba(144,185,0,.85);
+  color: #fff;
+}
+
+.bg-warning {
+  background-color: rgba(223,184,28,.85);
+  color: #fff;
+}
+
+.bg-danger {
+  background-color: rgba(232,86,86,.85);
+  color: #fff;
+}
+
+.blur-alert {
+  padding: 15px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}

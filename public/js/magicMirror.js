@@ -4,6 +4,35 @@ var realAge = null;
 var emotionInput = {};
 var detectedEmotion = {};
 
+function detectmob() {
+ if( navigator.userAgent.match(/Android/i)
+ || navigator.userAgent.match(/webOS/i)
+ || navigator.userAgent.match(/iPhone/i)
+ || navigator.userAgent.match(/iPad/i)
+ || navigator.userAgent.match(/iPod/i)
+ || navigator.userAgent.match(/BlackBerry/i)
+ || navigator.userAgent.match(/Windows Phone/i)
+ ){
+    return true;
+  }
+ else {
+    return false;
+  }
+}
+
+function detectmob2() {
+   if(window.innerWidth <= 800 && window.innerHeight <= 600) {
+     return true;
+   } else {
+     return false;
+   }
+}
+
+if(detectmob) $('#results').show();
+else{
+	if(detectmob2) $('#results').show();
+}
+
 //webcam setup
 Webcam.set({
 	// live preview size
@@ -150,7 +179,7 @@ detector.addEventListener("onImageResultsSuccess", function(faces, image, timest
 				dominantEmotion = '反感';
 				break;
 				case 'contempt':
-				dominantEmotion = '滿意';
+				dominantEmotion = '不屑';
 				break;
 				case 'anger':
 				dominantEmotion = '生氣';
@@ -201,7 +230,7 @@ detector.addEventListener("onImageResultsSuccess", function(faces, image, timest
 				translate = '反感';
 				break;
 				case 'contempt':
-				translate = '滿意';
+				translate = '不屑';
 				break;
 				case 'anger':
 				translate = '生氣';
@@ -259,7 +288,7 @@ $('#submit').click(function(){
 	$('#loadingMsg').html('傳送資料中......');
 	if(!realAge) var data = {userID: userID, emotionInput: emotionInput, detectedEmotion: detectedEmotion, birth: $('.dropdate').val(), physicalAge: physicalAge};
 	else var data = {userID: userID, ageDifference: (physicalAge - realAge), emotionInput: emotionInput, detectedEmotion: detectedEmotion};
-	$.ajax({
+	/*$.ajax({
 		type: "POST",
 		url: "/magicMirror/submitData",
 		contentType: "application/json; charset=utf-8",
@@ -278,7 +307,7 @@ $('#submit').click(function(){
 		failure: function(errMsg) {
 			alert(errMsg);
 		}
-	});
+	});*/
 });
 
 $("#joy-input").on("slide", function(slideEvt) {

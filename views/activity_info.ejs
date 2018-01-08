@@ -1,0 +1,256 @@
+<% include partials/head %>
+<link href="/css/custom.css" rel="stylesheet">
+<!-- fonts -->
+<link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,900" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.8.1/baguetteBox.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.8.1/baguetteBox.min.css">
+<link href="/css/photo_gallery.css" type="text/css" rel="stylesheet">
+<link href="/css/bootstrap.min.css" rel="stylesheet">
+<title><%= data.title %></title>
+<style>
+body {
+  background: white;
+}
+div#registration {
+  margin-top:60px;
+}
+
+.tab-pane {
+  padding-left: 30px;
+  padding-right: 50px;
+}
+
+div.title h2{
+  background-color: rgba(169,169,169, 0.6);
+  height: 200px;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+}
+
+.logo h1 {
+  background-color: rgba(72, 209, 204, 0.5);
+  border-radius: 3px;
+  margin-top: 30px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+div#activity-info p{
+  font-weight: bold;
+  display: inline;
+}
+
+.img-cropper {
+  height: 0px;
+  overflow: hidden;
+  padding-bottom: 80%;
+  margin: auto;
+  text-align: center;
+}
+.img-cropper img {
+  max-width: 100%;
+}
+
+</style>
+</head>
+<body>
+  <% include partials/navbar %>
+  <div class="loader">
+    <div>
+      <img src="/img/preloader.gif" />
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="row" style="background: white;">
+      <div class="col-sm-5 left-wrapper">
+        <div class="event-banner-wrapper" style="background: url(<%= data.coverPhoto_path %>); background-size: 600px;">
+          <div class="logo">
+            <h1><%= type %></h1>
+          </div>
+
+          <div class="title">
+            <h2>
+              <%= data.title %>
+              <span><%=moment.utc(data.startTime).local().format('YYYY/MM/DD hh:mm A') %>~<%=moment.utc(data.endTime).local().format('YYYY/MM/DD hh:mm A') %></span>
+              <span style="line-height: 0.5; margin-bottom: 100px;">瀏覽次數：<%= data.clickCount%></span>
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-7 right-wrapper">
+        <div class="event-ticket-wrapper">
+
+          <div class="event-tab">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+              <li role="presentation" class="active"><a href="#activity-info" aria-controls="activity-info" role="tab" data-toggle="tab" style="font-weight: bold;">活動資訊</a></li>
+              <li role="presentation"><a href="#registration" aria-controls="registration" role="tab" data-toggle="tab" style="font-weight: bold;">報名活動</a></li>
+              <% if(image_list){ %>
+                <li role="presentation"><a href="#album" aria-controls="album" role="tab" data-toggle="tab" style="font-weight: bold;">活動相簿</a></li>
+              <% } %>
+
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+              <div role="tabpanel" class="tab-pane fade in active" id="activity-info">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <h3><span class="badge badge-pill badge-danger" style="padding: 8px 10px; font-size: 18px;">活動資訊</span></h3>
+                    <div class="col-lg-12" style="line-height: 3; margin-bottom: 20px;">
+                      <p>開始時間：</p><span><%= moment(data.startTime).format('YYYY-MM-DD hh:mm:ss a'); %></span><br>
+                      <p>結束時間：</p><span><%= moment(data.endTime).format('YYYY-MM-DD hh:mm:ss a'); %></span><br>
+                      <p>活動地點：</p><span><%= data.venue %></span><br>
+                      <p>主辦單位：</p><span><%= data.host %></span><br>
+                      <p>協辦單位：</p><span><%= data.coHost %></span><br>
+                    </div>
+                    <h3><span class="badge badge-pill badge-danger" style="padding: 8px 10px; font-size: 18px;">聯絡資訊</span></h3>
+                    <div class="col-lg-12" style="line-height: 3; margin-bottom: 20px;">
+                      <p>聯絡人：</p><span><%= data.contactPerson %></span><br>
+                      <p>聯絡電話：</p><span><%= data.contactInfo.tel %></span><br>
+                      <p>email：</p><span><%= data.contactInfo.email %></span><br>
+                    </div>
+                    <h3><span class="badge badge-pill badge-danger" style="padding: 8px 10px; font-size: 18px;">活動內容</span></h3>
+                    <div class="col-lg-12" style="line-height: 3; margin-bottom: 20px;"><p><%= data.content %></p></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="registration" style="display: none;">
+              <div class="alert alert-success" style="display: none;">報名成功</div>
+              <div class="alert alert-danger" style="display: none;">報名失敗</div>
+              <% if(moment.utc(data.endTime).local() < moment.utc().local()){ %>
+                <h4> 活動已結束</h4>
+              <% }else if(user && !enroll.ifEnrolled) { %>
+                <form role="form" id="registration-form" method="post" enctype="multipart/form-data">
+                  <div class="row" style="margin-bottom: 20px;"><label> 請填寫個人資料再按下送出鍵<label></div>
+                  <div class="form-group row">
+                    <label class="col-form-label">姓名：</label><span><%= user.name %></span>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-form-label">性別：</label>
+                    <% if(user.gender == 'F'){ %>
+                      <span>女</span>
+                    <% }else{ %>
+                      <span>男</span>
+                    <% } %>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-form-label">生日：</label><span><%= moment(user.birth).format('YYYY-MM-DD'); %></span>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-form-label">聯絡電話</label>
+                    <input class="form-control" type="tel" name="tel">
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-form-label">聯絡信箱</label>
+                    <input class="form-control" type="email" name="email" value="<%= user.email %>">
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-form-label">身分證字號</label>
+                    <input class="form-control" type="text" name="idNum">
+                  </div>
+                  <div class="form-group row">
+                    <button id="submit" type="submit" class="btn btn-default" style="float: right;">送出</button>
+                  </div>
+                </form>
+              <% } else if(user && enroll.ifEnrolled){ %>
+                <h4> 您已報名成功！</h4>
+              <% } else{ %>
+                <h4> 請先登入再開始進行報名</h4>
+              <% } %>
+
+            </div>
+            <% if(image_list){ %>
+              <div role="tabpanel" class="tab-pane fade" id="album" style="display: none;">
+
+                <div class="tz-gallery" style="margin-top: 0;">
+
+                  <div class="row">
+                    <% if(data.album) { %>
+                      <% image_list.forEach(function(image){ %>
+                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                          <div class="thumbnail">
+                            <a class="lightbox" href="<%= image.path %>">
+                              <div class="img-cropper">
+                                <img class="crop" src="<%= image.path %>" alt="無法顯示" onerror="this.src='/img/blank.png';">
+                              </div>
+                            </a>
+                          </div>
+                        </div>
+                      <% }) %>
+                    <% } %>
+                  </div>
+
+                </div>
+            <% } %>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/allscript.js"></script>
+    <script>
+
+      baguetteBox.run('.tz-gallery');
+      $('#registration-form button#submit').click(function(e){
+        e.preventDefault();
+        var form = $('#registration-form')[0];
+        var data = new FormData(form);
+
+        $.ajax({
+          type: "POST",
+          enctype: 'multipart/form-data',
+          url: location.pathname +'/enroll',
+          data: data,
+          processData: false,
+          contentType: false,
+          cache: false,
+          timeout: 600000,
+          success: function (data) {
+            if(data.error){
+              $('div#registration .alert-danger').show();
+            }
+            else{
+              $('div#registration .alert-success').show();
+              $('#registration-form').hide();
+            }
+
+          }
+        });
+      });
+
+      $('.nav-tabs li').click(function(){
+        var active = $(this).find('a').attr('href');
+        if(active == '#activity-info'){
+          $('#registration').hide();
+          $('#activity-info').show();
+          $('#album').hide();
+        }
+        else if(active == '#registration'){
+          $('#activity-info').hide();
+          $('#registration').show();
+          $('#album').hide();
+        }
+        else{
+          $('#activity-info').hide();
+          $('#registration').hide();
+          $('#album').show();
+        }
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+      });
+    </script>
+</body>
+</html>

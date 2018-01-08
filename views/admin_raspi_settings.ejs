@@ -1,0 +1,107 @@
+<% include partials/admin_header %>
+<!-- DataTables -->
+<link rel="stylesheet" href="/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<style>
+.hover-change {
+  cursor: pointer;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+</style>
+</head>
+<body class="skin-blue sidebar-mini sidebar-collapse">
+  <div class="wrapper">
+    <% include partials/admin_navbar %>
+    <% include partials/admin_sidebar %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          裝置設定
+          <small>Device Settings</small>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="/admin/raspi"><i class="fa fa-camera"></i> 鏡頭監控</a></li>
+          <li><a href="#">裝置設定</a></li>
+        </ol>
+      </section>
+
+      <!-- Main content -->
+      <section class="content container-fluid">
+        <div class="alert alert-success" style="display: none;"></div>
+        <div class="alert alert-danger" style="display: none;"></div>
+        <div class="alert alert-warning" style="display: none;"></div>
+
+        <div class="row">
+          <div id="raspi-area" class="col-sm-12 col-md-8 col-lg-5">
+            <div class="box box-info">
+              <div class="box-header">
+                <h3 class="box-title">Device List</h3>
+                <button id="newDevice" class="btn btn-default" style="margin-left: 10px;"><i class="fa fa-plus" aria-hidden="true"></i> New Device</button>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <table id="raspiList" class="table table-bordered dataTable" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th> ID </th>
+                      <th>Location</th>
+                      <th>Last Active Time</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% for(var i in devices){ %>
+                      <tr>
+                        <td><%= devices[i]._id %></td>
+                        <td><%= devices[i].location %></td>
+                        <td><%= lastActive[i] %></td>
+                        <td>
+                          <i class="fa fa-pencil hover-change" aria-hidden="true"></i>
+                          <i class="fa fa-floppy-o hover-change" aria-hidden="true"  style="display: none;"></i>
+                          <i class="fa fa-trash-o hover-change" aria-hidden="true"></i>
+                        </td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+            <table id="newRow" style="display:none">
+              <tbody>
+                <tr>
+                  <td></td>
+                  <td><input name="location" type="text" placeholder="some place" style="width: 100px;"></td>
+                  <td></td>
+                  <td>
+                    <i class="fa fa-pencil hover-change" aria-hidden="true" style="display: none;"></i>
+                    <i class="fa fa-floppy-o hover-change" aria-hidden="true"></i>
+                    <i class="fa fa-trash-o hover-change" aria-hidden="true"></i>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include partials/admin_footer %>
+    <% include partials/admin_control_sidebar %>
+  </div>
+  <!-- ./wrapper -->
+
+  <script src="/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.0/js/dataTables.responsive.min.js"></script>
+  <script src="/js/admin/raspi_settings.js"></script>
+
+</body>
+</html>

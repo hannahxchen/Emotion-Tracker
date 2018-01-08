@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/css/bootstrap-slider.min.css">
     <script src="/js/libs/date.format.js"></script>
     <script src="/js/libs/jquery-dropdate.js"></script>
-    <script type="text/javascript" src="/js/libs/webcamjs/webcam.min.js"></script>
+    <script type="text/javascript" src="/bower_components/webcamjs/webcam.min.js"></script>
     <style type="text/css">
     		#my_camera{
       		margin-right: auto;
@@ -23,13 +23,14 @@
       		display: flex;
       		justify-content: center;
     		}
-    	</style>
+    </style>
   </head>
   <body>
     <% include partials/navbar %>
     <div id="logs" style="font-size: 20px; padding-top: 60px; text-align: center;"></div>
     <div class="row" id="imageDetect" style="display: none; margin-left: 50px; font-size: 20px; padding-left: 50px;">
       <div id="my_camera"></div>
+      <div id="results" style="display: none;"><div>
       <div id="shot">
         <input type=button value="拍照" onClick="preview_snapshot()">
       </div>

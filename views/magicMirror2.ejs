@@ -1,0 +1,308 @@
+<% include partials/head %>
+    <title>情緒魔鏡</title>
+    <script src="https://download.affectiva.com/js/3.1/affdex.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/bootstrap-slider.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/css/bootstrap-slider.min.css">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/drilldown.js"></script>
+    <script src="/js/libs/date.format.js"></script>
+    <script src="/js/libs/jquery-dropdate.js"></script>
+    <script type="text/javascript" src="/bower_components/webcamjs/webcam.min.js"></script>
+    <style type="text/css">
+    		#my_camera{
+      		margin-right: auto;
+      		margin-left: auto;
+    		}
+
+    		#imageDetect,
+    		#userInput{
+    			padding-top: 60px;
+    		}
+
+    		#shot,
+    		#reshot,
+    		#submit_photo{
+          margin-top: 10px;
+      		justify-content: center;
+    		}
+    </style>
+  </head>
+  <body>
+    <% include partials/navbar %>
+    <div id="logs" style="font-size: 20px; padding-top: 40px; text-align: center;"></div>
+    <div class="row" id="imageDetect" style="font-size: 20px; text-align: center;">
+      <div id="my_camera"></div>
+      <input id="shot" class="btn btn-default" type=button value="拍照" onClick="preview_snapshot()">
+      <input id="reshot" style="display: none;" class="btn btn-default" type=button value="重拍" onClick="cancel_preview()">
+      <input id="submit_photo" style="display: none;" class="btn btn-default" type=button value="送出" onClick="startTest()">
+      <div id="loadingMsg" style="padding-top: 30px; text-align: center;"></div>
+      <h3 id="resultsTitle" style="font-weight: bold; margin-bottom: 20px; margin-top: 0;"></h3>
+      <div class="row" id="age-wrapper" style="margin-bottom: 20px;">
+        <div class="col-lg-12" id="physicalAge"></div>
+      </div>
+      <div class="row" id="emotion-wrapper" style="display: none;">
+        <div class="col-lg-12" id="emotion">
+          <div class="row">
+            <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12" id="results" style="margin-left: 70px;"></div>
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="plot"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <% include partials/footer %>
+    <script>
+    var physicalAge = null;
+    var detectedEmotion = {};
+    var count = 0;
+    var chart;
+
+    function detectmob() {
+      if( navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i)
+    ){
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  function detectmob2() {
+    if(window.innerWidth <= 800 && window.innerHeight <= 600) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  if(detectmob) $('#results').show();
+  else{
+    if(detectmob2) $('#results').show();
+  }
+
+  //webcam setup
+  Webcam.set({
+    // live preview size
+    width: 320,
+    height: 240,
+
+    // device capture size
+    dest_width: 640,
+    dest_height: 480,
+
+    // final cropped size
+    crop_width: 640,
+    crop_height: 480,
+
+    // format and quality
+    image_format: 'jpeg',
+    jpeg_quality: 90,
+    flip_horiz: true
+  });
+
+  Webcam.attach( '#my_camera');
+
+  function preview_snapshot() {
+    // freeze camera so user can preview pic
+    Webcam.freeze();
+
+    // swap button sets
+    $('#shot').hide();
+    $('#reshot').show();
+    $('#submit_photo').show();
+  }
+
+  function cancel_preview() {
+    // cancel preview freeze and return to live camera feed
+    Webcam.unfreeze();
+
+    // swap buttons back
+    $('#shot').show();
+    $('#reshot').hide();
+    $('#submit_photo').hide();
+  }
+
+  function startTest(){
+    $('#shot').show();
+    $('#reshot').hide();
+    $('#submit_photo').hide();
+    Webcam.snap( function(data_uri) {
+      $('#physicalAge, #results, #resultsTitle').html('');
+      $('#loadingMsg').html('分析中，請稍後......');
+      $('#age-wrapper').hide();
+      $('#emotion-wrapper').hide();
+      $('#resultsTitle').hide();
+      $('#birth').hide();
+      $('#inputArea').hide();
+      $('#realAge').empty();
+      $('dominantEmotion').html('');
+      $('#submit').attr("disabled", false);
+      recognize(data_uri.replace('data:image/jpeg;base64,', ''));
+    });
+  }
+
+  //Convienence function for logging to the DOM
+  function log(node_name, msg) {
+  	$(node_name).append("<span>" + msg + "</span><br />");
+  }
+
+  function recognize(img_base64){
+    $.ajax({
+      type: "POST",
+  		url: "/magicMirror/recognize",
+  		contentType: "application/json; charset=utf-8",
+  		dataType: "json",
+      data: JSON.stringify({image: img_base64}),
+      success: function(data){
+        console.log(data);
+        if(data.status == 'No face found')
+        $('#loadingMsg').html("偵測不到臉，請重拍一次！");
+        else if (data.status == 'Too many faces')
+        $('#loadingMsg').html("請一次偵測一張臉！");
+        else if(data.error)
+        $('#loadingMsg').html("偵測失敗");
+        else{
+          physicalAge = data.physicalAge;
+          $('#loadingMsg').html('');
+          $('#physicalAge').html('生理年齡：'+ data.age);
+          $('#emotion-wrapper').show();
+          $('#age-wrapper').show();
+          $('#resultsTitle').show();
+
+          if(data.gender == 'F')
+          log('#resultsTitle', "親愛的美女，以下是您的偵測結果：");
+          else if(data.gender == 'M')
+          log('#resultsTitle', "親愛的帥哥，以下是您的偵測結果：");
+          else
+          log('#resultsTitle', "您好，以下是您的偵測結果：");
+
+          plot(data.emotions);
+
+          $.each(data.emotions, function(key, val){
+
+            var translate;
+      			switch(key){
+      				case 'happiness':
+      				translate = '開心(Happiness)';
+      				break;
+      				case 'sadness':
+      				translate = '傷心(Sadness)';
+      				break;
+      				case 'disgust':
+      				translate = '反感(Disgust)';
+      				break;
+      				case 'contempt':
+      				translate = '不屑(Contempt)';
+      				break;
+      				case 'anger':
+      				translate = '生氣(Anger)';
+      				break;
+      				case 'fear':
+      				translate = '害怕(Sadness)';
+      				break;
+      				case 'surprise':
+      				translate = '驚訝(Surprise)';
+      				break;
+              case 'neutral':
+              translate = '中性(Neutral)'
+              break;
+      				default:
+      				translate = null;
+      				break;
+            }
+            if(translate){
+        			$('#results').append('<div id='+ key +' style= "margin-bottom: 30px;"></div>');
+        			log('#' + key, translate + "：" + (val*100).toFixed(5)+'%');
+        		}
+          });
+        }
+      },
+      failure: function(errMsg) {
+        $('#loadingMsg').html('辨識系統錯誤！');
+        alert(errMsg);
+      }
+    });
+  }
+
+    function plot(emotions){
+      if(count > 0) chart.destroy();
+      count++;
+      chart = Highcharts.chart('plot', {
+        chart: {
+          type: 'column'
+        },
+        title: {
+          text: 'Your Emotion Ratio'
+        },
+        xAxis: {
+          type: 'category'
+        },
+        yAxis: {
+          title: {
+            text: 'percent(%)'
+          },
+          max: 100,
+          min: 0
+        },
+        legend: {
+          enabled: false
+        },
+        plotOptions: {
+          series: {
+            borderWidth: 0,
+            dataLabels: {
+              enabled: true,
+              format: '{point.y:.1f}%'
+            }
+          }
+        },
+
+        tooltip: {
+          headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+          pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.5f}%</b> of total<br/>'
+        },
+
+        series: [{
+          name: 'Emotions',
+          colorByPoint: true,
+          data: [{
+            name: 'Anger',
+            y: emotions.anger*100
+          }, {
+            name: 'Contempt',
+            y: emotions.contempt*100
+          }, {
+            name: 'Disgust',
+            y: emotions.disgust*100
+          }, {
+            name: 'Fear',
+            y: emotions.fear*100
+          }, {
+            name: 'Happiness',
+            y: emotions.happiness*100
+          }, {
+            name: 'Neutral',
+            y: emotions.neutral*100
+          }, {
+            name: 'Sadness',
+            y: emotions.sadness*100
+          }, {
+            name: 'Surprise',
+            y: emotions.surprise*100
+          }
+        ]
+      }]
+    });
+  }
+
+  </script>
+
+  </body>
+</html>

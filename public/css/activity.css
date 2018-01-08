@@ -5,8 +5,8 @@
 
 .carousel-inner > .item > img {
   margin: auto;
-  width: 400px;
-  height: 300px;
+  width: 70%;
+  height: auto;
 }
 
 #myCarousel .nav a small {

@@ -1,11 +1,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var autoIncrement = require('mongoose-auto-increment');
-var prefix = 'emo_';
 
 var EmotionSchema = mongoose.Schema({
   user_id: String,
-  media: String,
   emotions: Object,
   createdAt: {
     type: Date,
@@ -13,7 +10,14 @@ var EmotionSchema = mongoose.Schema({
   }
 });
 
-autoIncrement.initialize(mongoose.connection);
-EmotionSchema.plugin(autoIncrement.plugin, { model: 'Emotion', prefix: prefix, field: 'emotionID' });
+var EmotionTmpSchema = mongoose.Schema({
+  image_id: String,
+  faces: [{
+    position: Object,
+    emotions: Object
+  }]
+});
 
-var Emotion = module.exports = mongoose.model('Emotion', EmotionSchema);
+
+var Emotion = module.exports.Emotion = mongoose.model('Emotion', EmotionSchema);
+var EmotionTmp = module.exports.EmotionTmp = mongoose.model('EmotionTmp', EmotionTmpSchema);

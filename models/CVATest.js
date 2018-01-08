@@ -1,20 +1,17 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var autoIncrement = require('mongoose-auto-increment');
 var fs = require('fs');
-var test_prefix = 'cva_';
-var audio_prefix = 'audio_';
-var sample_prefix = 'sample_';
 var Landmark = ('./landmarks');
 var Image = ('./image').Image;
+var ObjectId = mongoose.Schema.ObjectId;
 
 var CVATestSchema = mongoose.Schema({
   user_id: String,
   angle: Number,
   speechAccuracy: Number,
-  landmark_id: String,
+  landmarks: {type: ObjectId, ref: 'Landmark'},
   image_id: String,
-  audio_id: String,
+  audio: {type: ObjectId, ref: 'CVAAudio'},
   testTime: {
     type: Date,
     default: Date.now
@@ -28,33 +25,29 @@ var CVAAudioSchema = mongoose.Schema({
   },
   duration: Number,
   text: String,
-  sampleText_id: String
+  sampleText: {type: ObjectId, ref: 'SampleText'},
 });
 
 var SampleTextSchema = mongoose.Schema({
-  text: String
+  text: String,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
-
-autoIncrement.initialize(mongoose.connection);
-CVATestSchema.plugin(autoIncrement.plugin, { model: 'CVATest', prefix: test_prefix, field: 'CVATestID' });
-CVAAudioSchema.plugin(autoIncrement.plugin, { model: 'CVAAudio', prefix: audio_prefix, field: 'CVAAudioID' });
-SampleTextSchema.plugin(autoIncrement.plugin, { model: 'SampleText', prefix: sample_prefix, field: 'SampleTextID' });
 
 var CVATest = module.exports.CVATest = mongoose.model('CVATest', CVATestSchema);
 var CVAAudio = module.exports.CVAAudio = mongoose.model('CVAAudio', CVAAudioSchema);
 var SampleText = module.exports.SampleText = mongoose.model('SampleText', SampleTextSchema);
 
 module.exports.createSampleText = function updateSampleText(text){
-  SampleText.nextCount(function(err, count){
-    var newSampleText = new SampleText({sampleTextID: count, text: text});
-    newSampleText.save(function(err){
-      if(err) throw err;
-    });
-  });
+  SampleText.create({text: text}, function(err){
+    if(err) console.log(err);
+  })
 };
 
 module.exports.saveResults = function saveResults(userID, angle, speechAccuracy, imgID, audioID, landmarkID){
-  var newCVATest = new CVATest({user_id: userID, angle: angle, speechAccuracy: speechAccuracy, image_id: imgID, audio_id: audioID, landmark_id: landmarkID});
+  var newCVATest = new CVATest({user_id: userID, angle: angle, speechAccuracy: speechAccuracy, image_id: imgID, audio: audioID, landmark: landmarkID});
   newCVATest.save(function(err){
     if(err) throw err;
   });

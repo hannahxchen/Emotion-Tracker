@@ -1,0 +1,386 @@
+<% include partials/head %>
+    <title>照片</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/bower_components/exif-js/exif.js"></script>
+    <script type="text/javascript" src="/bower_components/dropzone-js/dropzone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.8.1/baguetteBox.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.8.1/baguetteBox.min.css">
+    <link href="/bower_components/dropzone-js/dropzone.css" type="text/css" rel="stylesheet">
+    <link href="/css/photo_gallery.css" type="text/css" rel="stylesheet">
+    <style>
+    .img-cropper {
+      height: 0px;
+      overflow: hidden;
+      padding-bottom: 70%;
+      margin: auto;
+      text-align: center;
+    }
+    .img-cropper img {
+      max-width: 100%;
+    }
+    </style>
+  </head>
+  <body>
+    <% include partials/navbar %>
+    <div class="container gallery-container" style="margin-top: 60px;">
+
+      <div id="message" class="alert alert-info" style="display: none;">
+        <strong>請選擇欲刪除的照片</strong>
+      </div>
+      <div id="alert-success" class="alert alert-success" style="display: none;"></div>
+      <div id="alert-danger" class="alert alert-danger" style="display: none;"></div>
+      <div id="alert-warning" class="alert alert-warning" style="display: none;"></div>
+
+      <h1 id="album-title"><%= album.title %></h1>
+      <% if(role == 'admin') { %>
+        <div id="admin-toolbox" style="float: left;">
+          <div class="btn-group" style="margin-left: 20px;">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+              Action <span class="fa fa-caret-down"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li id="upload"> <a data-toggle="modal" data-target="#uploadModal">Upload</a></li>
+              <li id="select"><a>Select</a></li>
+              <li id="cancel" style="display: none;"><a>Cancel</a></li>
+              <li id="edit"><a data-toggle="modal" data-target="#editModal">Change Title</a></li>
+              <li id="delete" style="display: none;"><a style="color: red;" data-toggle="modal" data-target="#deleteModal">Delete</a></li>
+              <li id="deleteAlbum"><a style="color: red;" data-toggle="modal" data-target="#deleteAlbumModal">Delete Album</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="modal fade" id="uploadModal">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="text-left"><b>上傳照片</b></h2>
+              </div>
+              <div class="modal-body">
+                <div class="alert alert-danger" style="display: none;">
+                  照片尚未上傳完畢，請勿關閉視窗
+                </div>
+                <div class="alert alert-success" style="display: none;">
+                  上傳成功
+                </div>
+                <div class="alert alert-warning" style="display: none;">
+                  您尚未選擇任何檔案
+                </div>
+                <form action="/photos/<%= album._id %>/upload" id="mydropzone" method="button" enctype="multipart/form-data" class="dropzone needsclick dz-clickable">
+                  <div class="dz-message needsclick">拖曳或點選這裡上傳照片，選擇完照片後請按右下開始上傳</div>
+                  <div class="fallback">
+                    <input name="file" type="file" accept="image/*" multiple />
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button id="startUpload" class="btn btn-default">開始上傳</button>
+                <button class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+              </div>
+              <div class="modal-body text-center">
+                確定要刪除此選取的照片？
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" id="confirm" class="btn btn-primary">確定</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="deleteAlbumModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+              </div>
+              <div class="modal-body text-center">
+                確定要刪除此此相簿？
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" id="confirm" class="btn btn-primary">確定</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">編輯相簿</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <div class="form-group">
+                    <label>相簿名稱</label>
+                    <input type="text" class="form-control" placeholder="title" name="title" value="<%= album.title %>">
+                  </div>
+                  <button id="submit" type="submit" class="btn btn-default" style="float: right;">送出</button>
+                </form>
+              </div>
+              <div class="modal-footer">
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <p class="page-description" style="float: right;">上次更新時間：<%= moment(album.lastModified).format('YYYY/MM/DD HH:mm:ss') %></p>
+
+      <div class="tz-gallery" style="margin-top: 50px;">
+
+        <div class="row">
+          <% if(album.image_list) { %>
+            <% album.image_list.forEach(function(image){ %>
+              <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="thumbnail" id="<%= image.imageID %>">
+                  <a class="lightbox" href="<%= image.path %>">
+                    <div class="img-cropper">
+                      <img class="crop" src="<%= image.path %>" alt="無法顯示" onerror="this.src='/img/blank.png';">
+                    </div>
+                  </a>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+
+      </div>
+
+    </div>
+    <% include partials/footer %>
+    <script>
+      var socket=io.connect();
+      var select = false;
+      var alert = false;
+      var myDropzone;
+      var push = true;
+      var album_id = window.location.pathname.replace('/photos/album/', '');
+
+      Dropzone.options.mydropzone = {
+        acceptedFiles: "image/jpeg",
+        resizeWidth: 1000,
+        uploadMultiple: true,
+        parallelUploads: 1,
+        autoProcessQueue: false,
+        init: function(){
+          myDropzone = this;
+          this.on('addedfile', function(file) {
+            $('#uploadModal .alert-warning').hide();
+            $('.dz-message').hide();
+          });
+          this.on('queuecomplete', function(file){
+            this.removeAllFiles();
+            $('.dz-message').show();
+            $('#startUpload').show();
+            $('#uploadModal .alert-danger').hide();
+            $('#uploadModal .alert-success').show();
+            $(".dz-hidden-input").prop("disabled", false);
+            $("form.dropzone").addClass('dz.clickable');
+          });
+        }
+      };
+
+      $('#startUpload').click(function(){
+        if(myDropzone.getAcceptedFiles().length > 0) {
+          //myDropzone.enqueueFiles(myDropzone.getAcceptedFiles());
+          myDropzone.processQueue();
+          $(".dz-hidden-input").prop("disabled",true);
+          $("form.dropzone").removeClass('dz.clickable');
+          $(this).hide();
+        }
+        else
+          $('#uploadModal .alert-warning').show();
+      });
+
+      socket.on('upload-file', function(confirm){
+        if(confirm && myDropzone.getQueuedFiles().length > 0){
+          myDropzone.processQueue();
+        }
+      });
+
+      baguetteBox.run('.tz-gallery');
+
+      socket.on('update-album', function(data){
+        baguetteBox.destroy('.tz-gallery');
+        $('.tz-gallery .row').html('');
+        data.forEach(function(img){
+          $('.tz-gallery .row').append('<div class="col-sm-6 col-md-4 grid"><div class="thumbnail" id="'+img.imageID+'"><a class="lightbox" href="'+img.path+'"><img src="'+img.path+'" alt="無法顯示" onerror="this.src="/img/blank.png";"></a></div></div>');
+        });
+        baguetteBox.run('.tz-gallery');
+      });
+
+      $('#select').click(function(){
+        $(".tz-gallery a").each(function(){
+          $(this).removeAttr('href');
+        });
+        baguetteBox.destroy('.tz-gallery');
+        $('#select').hide();
+        $('#upload').hide();
+        $('#edit').hide();
+        $('#cancel').show();
+        $('#delete').show();
+        $('#deleteAlbum').hide();
+        $('#message').show();
+        select = true;
+      });
+
+      $('#cancel').click(function(){
+        $('#message').hide();
+        $('#delete').show();
+        $('#deleteAlbum').hide();
+        $('#cancel').hide();
+        $('#upload').show();
+        $('#select').show();
+        $('#edit').show();
+        $('.selected').each(function(){
+          $(this).find('.thumbnail').css('background-color', '#fff');
+        });
+        $(".tz-gallery a").each(function(){
+          $(this).attr('href', $(this).find('img').attr('src'));
+        });
+        baguetteBox.run('.tz-gallery');
+        select = false;
+      });
+
+      $('#deleteModal #confirm').click(function(){
+        var img_ids = [];
+        $('.selected').each(function(){
+          img_ids.push($(this).find('.thumbnail').attr('id'));
+        });
+
+        $('#message').hide();
+        $('#delete').hide();
+        $('#deleteAlbum').show();
+        $('#cancel').hide();
+        $('#upload').show();
+        $('#select').show();
+        $('#edit').show();
+        $('#deleteModal').modal('hide');
+        if(img_ids.length > 0){
+          $.ajax({
+            url: '/photos/deletePhotos',
+            type: 'POST',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify({album_id: album_id, img_ids: img_ids}),
+            success: function(result) {
+              if(result.error){
+                $('#alert-danger').show();
+                $('#alert-danger').text('刪除失敗');
+                $(".tz-gallery a").each(function(){
+                  $(this).attr('href', $(this).find('img').attr('src'));
+                });
+              }
+              else{
+                $('#alert-success').show();
+                $('#alert-success').text('刪除成功');
+                $('.selected').remove();
+                baguetteBox.run('.tz-gallery');
+              }
+            }
+          });
+        }
+      });
+
+      $('.thumbnail').click(function(){
+        if(select){
+          if($(this).parent().hasClass('selected')){
+            $(this).parent().removeClass('selected');
+            $(this).css('background-color', '#fff');
+          }
+          else{
+            $(this).parent().addClass('selected');
+            $(this).css('background-color', '#0088cc');
+          }
+        }
+      });
+
+      $("#deleteAlbumModal #confirm").click(function(){
+        $.ajax({
+          url: '/photos/removeAlbum/'+ album_id,
+          type: 'POST',
+          success: function(result) {
+            window.location = '/photos';
+          }
+        });
+      });
+
+      $('#uploadModal').on('hide.bs.modal', function (e) {
+        if(myDropzone.getQueuedFiles().length > 0){
+          $('#uploadModal .alert-danger').show();
+          e.preventDefault();
+        }
+        else{
+          myDropzone.removeAllFiles();
+          $('#uploadModal .alert-danger').hide();
+          $('#uploadModal .alert-success').hide();
+          $('#uploadModal .alert-warning').hide();
+          $(".tz-gallery a").each(function(){
+            $(this).attr('href', $(this).find('img').attr('src'));
+            baguetteBox.run('.tz-gallery');
+          });
+          select = false;
+        }
+      });
+
+      $('.btn-group li').click(function(){
+        $('#alert-danger').hide();
+        $('#alert-success').hide();
+        $('#alert-warning').hide();
+      });
+
+      $('#uploadModal form').click(function(){
+        $('#uploadModal .alert-danger').hide();
+        $('#uploadModal .alert-success').hide();
+        $('#uploadModal .alert-warning').hide();
+      });
+
+
+      $('#editModal button#submit').click(function(e){
+        e.preventDefault();
+        var newTitle =  $('#editModal form input').val();
+        $.ajax({
+          url: "/photos/album/"+album_id+"/edit",
+          type: 'POST',
+          contentType: "application/json; charset=utf-8",
+          dataType: "json",
+          data: JSON.stringify({title: newTitle}),
+          success: function(result) {
+            console.log(result);
+            if(result.error){
+              $('#alert-danger').show();
+              $('#alert-danger').text('修改失敗');
+            }
+            else{
+              $('#alert-success').show();
+              $('#alert-success').text('修改成功');
+              $('h1#album-title').text(newTitle);
+            }
+          }
+        });
+        $('#editModal').modal('hide');
+        $('#editModal input').val($('#album-title').text());
+      });
+    </script>
+  </body>
+</html>

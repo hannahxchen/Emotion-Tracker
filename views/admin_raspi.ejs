@@ -1,0 +1,203 @@
+<% include partials/admin_header %>
+<!-- DataTables -->
+<link rel="stylesheet" href="/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.1/css/select.dataTables.min.css">
+</head>
+<body class="skin-blue sidebar-mini sidebar-collapse">
+  <div class="wrapper">
+    <% include partials/admin_navbar %>
+    <% include partials/admin_sidebar %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          Log管理分析
+          <small>Optional description</small>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-camera"></i> 鏡頭監控</a></li>
+          <li><a href="#">Log分析管理</a></li>
+        </ol>
+      </section>
+
+      <!-- Main content -->
+      <section class="content container-fluid">
+        <div class="alert alert-success" style="display: none;"></div>
+        <div class="alert alert-danger" style="display: none;"></div>
+        <div class="alert alert-warning" style="display: none;"></div>
+        <div class="row">
+          <div id="log-area" class="col-sm-12 col-md-12 col-lg-12">
+            <div class="box box-info">
+              <div class="box-header">
+                <h3 class="box-title">RaspiLog List</h3>
+                <div class="btn-group" style="margin-left: 20px;">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    Action <span class="fa fa-caret-down"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li id="select"><a>Select</a></li>
+                    <li id="cancel" style="display: none;"><a>Cancel</a></li>
+                    <li id="delete" style="display: none;"><a style="color: red;" data-toggle="modal" data-target="#deleteLogModal">Delete</a></li>
+                  </ul>
+                </div>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <table id="logList" class="table table-bordered table-hover dataTable" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th style="display: none;"></th>
+                      <th>LogID</th>
+                      <th>UserID</th>
+                      <th>RaspberryPi_id</th>
+                      <th>Location</th>
+                      <th>EmotionID</th>
+                      <th>Appear Time</th>
+                      <th>Disappear Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% logs.forEach(function(log){ %>
+                      <tr>
+                        <td style="display: none;"></td>
+                        <td><%= log._id %></td>
+                        <td><%= log.user_id %></td>
+                        <% if(log.raspberryPi) { %>
+                          <td><%= log.raspberryPi._id %></td>
+                          <td><%= log.raspberryPi.location %></td>
+                        <% }else{ %>
+                          <td></td>
+                        <% } %>
+                        <% if(log.emotion_id) { %>
+                          <td><%= log.emotion_id[0] %></td>
+                        <% } else{ %>
+                          <td></td>
+                        <% } %>
+
+                        <td><%= moment.utc(log.appear_time).local().format('YYYY/MM/DD HH:mm:ss') %></td>
+                        <td><%= moment.utc(log.disappear_time).local().format('YYYY/MM/DD HH:mm:ss') %></td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+            <!-- Modal -->
+            <div class="modal fade" id="deleteLogModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                  </div>
+                  <div class="modal-body text-center">
+                    確定要刪除選取的資料？
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" id="confirm" class="btn btn-primary">確定</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="row">
+          <div id="sensorData-area" class="col-sm-12 col-md-12 col-lg-12">
+            <div class="box box-info">
+              <div class="box-header">
+                <h3 class="box-title">SensorData List</h3>
+                <div class="btn-group" style="margin-left: 20px;">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    Action <span class="fa fa-caret-down"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li id="select"><a>Select</a></li>
+                    <li id="cancel" style="display: none;"><a>Cancel</a></li>
+                    <li id="delete" style="display: none;"><a style="color: red;" data-toggle="modal" data-target="#deleteDataModal">Delete</a></li>
+                  </ul>
+                </div>
+                <button id="getCSV" class="btn btn-default" style="margin-left: 5px;"><a href="/admin/getCSV/sensorData" style="color: #666; text-decoration: none;">Export to CSV</a></button>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <table id="sensorDataList" class="table table-bordered table-hover dataTable" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th style="display: none;"></th>
+                      <th>ID</th>
+                      <th>RaspberryPi_id</th>
+                      <th>Location</th>
+                      <th>Temperature</th>
+                      <th>Humidity</th>
+                      <th>PM2.5</th>
+                      <th>CO2</th>
+                      <th>Detected Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% sensorData.forEach(function(data){ %>
+                      <tr>
+                        <td></td>
+                        <td><%= data._id %></td>
+                        <td><%= data.raspberryPi._id %></td>
+                        <td><%= data.raspberryPi.location %></td>
+                        <td><%= data.temperature %></td>
+                        <td><%= data.humidity %></td>
+                        <td><%= data.pm25 %></td>
+                        <td><%= data.co2 %></td>
+                        <td><%= moment.utc(data.detected_time).local().format('YYYY/MM/DD HH:mm:ss') %></td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+            <!-- Modal -->
+            <div class="modal fade" id="deleteDataModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                  </div>
+                  <div class="modal-body text-center">
+                    確定要刪除選取的資料？
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" id="confirm" class="btn btn-primary">確定</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include partials/admin_footer %>
+    <% include partials/admin_control_sidebar %>
+  </div>
+  <!-- ./wrapper -->
+
+  <script src="/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/select/1.2.1/js/dataTables.select.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.0/js/dataTables.responsive.min.js"></script>
+  <script src="/js/admin/raspi.js"></script>
+
+</body>
+</html>

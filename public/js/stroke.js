@@ -5,25 +5,46 @@ var sampleText;
 var audioText;
 var landmarks = [];
 
-//webcam setup
-Webcam.set({
-	// live preview size
-	width: 320,
-	height: 240,
+var md = new MobileDetect(window.navigator.userAgent);
+if(md.mobile() || md.phone() || md.tablet()){
 
-	// device capture size
-	dest_width: 640,
-	dest_height: 480,
+  Webcam.set({
+    // live preview size
+    width: 320,
+    height: 240,
 
-	// final cropped size
-	crop_width: 640,
-	crop_height: 480,
+    // format and quality
+    image_format: 'jpeg',
+    jpeg_quality: 90,
+    flip_horiz: true,
+    audio: true,
 
-	// format and quality
-	image_format: 'jpeg',
-	jpeg_quality: 90,
-	flip_horiz: true
-});
+    facingMode: { exact: "environment" }
+  });
+}
+else{
+  Webcam.set({
+    // live preview size
+    width: 320,
+    height: 240,
+
+    // device capture size
+    dest_width: 640,
+    dest_height: 480,
+
+    // final cropped size
+    crop_width: 640,
+    crop_height: 480,
+
+    // format and quality
+    image_format: 'jpeg',
+    jpeg_quality: 90,
+    flip_horiz: true,
+    audio: true,
+
+    facingMode: { exact: "environment" }
+  });
+}
 
 Webcam.attach( '#my_camera');
 
@@ -164,10 +185,10 @@ function trackFaces(image) {
 					var deg = calcAngle(m1, m2);
 					angle = Math.abs(90 - deg);
 					if(face.vertices[points[0] + 1] < face.vertices[points[1] + 1]){
-						log('#results', "順時針傾斜(左高右低): " + angle + "°");
+						log('#results', "順時針傾斜(左高右低): " + angle.toFixed(2) + "°");
 						angle *= (-1);
 					}
-					else log('#results', "逆時針傾斜(右高左低): " + angle + "°");
+					else log('#results', "逆時針傾斜(右高左低): " + angle.toFixed(2) + "°");
 
 					drawLine(face.vertices[points[0]], face.vertices[points[0] + 1],
 						face.vertices[points[1]], face.vertices[points[1] + 1]);
@@ -286,7 +307,8 @@ $('#next').click(function(){
 		return s.replace(s.substr(0,1), function(m) { return m.toUpperCase(); });
 	}
 
-	$('#start_button').click(function(event){
+	$('#start_button').click(function(e){
+    e.preventDefault();
 		$('#stop_button').show();
 		$('#start_button').hide();
 		$('#pause_button').hide();
@@ -304,9 +326,10 @@ $('#next').click(function(){
 		$('#stop_button_button').attr("disabled", false);
 	});
 
-	$('#stop_button').click(function (event){
+	$('#stop_button').click(function (e){
+    e.preventDefault();
 		$('#start_button').show();
-		$('#start_button').text('重新錄音');
+    $('#start_button').children().eq(0).text('重新錄音');
 		$('#stop_button').hide();
 		$('#sendResults').show();
 		$('#play_button').show();
@@ -318,12 +341,14 @@ $('#next').click(function(){
 		$('#stop_button_button').attr("disabled", true);
 	});
 
-	$('#play_button').click(function(){
+	$('#play_button').click(function(e){
+    e.preventDefault();
 		microm.play();
 		$('#pause_button').show();
 	});
 
-	$('#pause_button').click(function(){
+	$('#pause_button').click(function(e){
+    e.preventDefault();
 		microm.pause();
 	});
 
@@ -345,7 +370,8 @@ $('#next').click(function(){
 	  console.log(duration);
 	}
 
-	$('#sendResults').click(function(){
+	$('#sendResults').click(function(e){
+    e.preventDefault();
 		microm.getBase64().then(function(base64string) {
 			var audio_base64 = base64string.replace('data:audio/mp3;base64,', '');
 			audioText = $('#final_span').text();
@@ -377,7 +403,7 @@ function generateText(){
     url: "/strokeTest/generateText",
     dataType: "json",
     success: function(data){
-			sampleTextID = data.SampleTextID;
+			sampleTextID = data._id;
 			$('#plainText').text(data.text);
 			sampleText = data.text;
 		},
@@ -388,9 +414,12 @@ function generateText(){
 }
 
 $('#testAgain').click(function(){
-	$('#testComplete').hide();
+	/*$('#testComplete').hide();
 	$('#imageDetect').show();
 	$('#results').html("");
+  $('#start_button').children().eq(0).text('開始錄音');
+  $('#play_button').hide();
 	var imageDataCtx = imageData.getContext("2d");
-	imageDataCtx.clearRect(0, 0, 640, 480);
+	imageDataCtx.clearRect(0, 0, 640, 480);*/
+  location.reload();
 });

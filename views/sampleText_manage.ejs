@@ -3,7 +3,7 @@
   </head>
   <body>
     <% include partials/navbar %>
-    <div class="container">
+    <div class="container" style="margin-top: 60px;">
       <% if (success_msg) {%>
         <div class="alert alert-success"><%= success_msg %></div>
       <% } %>
@@ -21,7 +21,7 @@
             <div class="modal-body">
               <form method="post" action="/strokeTest/createSampleText" id="sampleText">
                 <div class = "form-group">
-                  <label> 文字內容 (文字長度必須為10 ~ 50字)</label><br>
+                  <label> 文字內容 (文字長度必須為10 ~ 300字)</label><br>
                   <textarea rows="5" cols="50" name="text" form="sampleText"></textarea>
                 </div>
                 <button id="submit" type="submit" class="btn btn-default" style="margin-left: 300px; margin-bottom:10px;">新增</button>

@@ -1,0 +1,52 @@
+<div id="userList-area" class="col-xs-12 col-md-12 col-lg-7">
+
+  <div class="box">
+    <div class="box-header">
+      <h3 class="box-title">User List</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+      <table id="userList" class="table table-bordered table-hover dataTable table-responsive" cellspacing="0" width="100%">
+        <thead>
+          <tr>
+            <th style="display: none;"></th>
+            <th> ID </th>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Role</th>
+            <th>CreatedAt</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (users) { %>
+            <% users.forEach(function(user){ %>
+              <tr>
+                <td style="display: none;"></td>
+                <td><%= user.userID %></td>
+                <td class="list-username"><%= user.username %></td>
+                <td class="list-name"><%= user.name %></td>
+                <td class="list-gender"><%= user.gender %></td>
+                <% if(user.role == 'elder'){ %>
+                  <td class="list-role">一般使用者</td>
+                <% }else if(user.role == 'relative'){ %>
+                  <td class="list-role">家屬</td>
+                <% }else if(user.role == 'admin'){ %>
+                  <td class="list-role">管理員</td>
+                <% }else if(user.role == 'unregistered'){ %>
+                  <td class="list-role">未註冊</td>
+                <% }else if(user.role == 'unknown'){ %>
+                  <td class="list-role">未知</td>
+                <% } %>
+
+                <td><%= moment(user.createdAt).format('YYYY/MM/DD HH:mm:ss') %> </td>
+              </tr>
+            <% }) %>
+          <% } %>
+        </tbody>
+      </table>
+
+    </div>
+    <!-- /.box-body -->
+  </div>
+</div>

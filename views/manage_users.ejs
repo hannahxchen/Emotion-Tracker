@@ -1,0 +1,363 @@
+<% include partials/admin_header %>
+<!-- DataTables -->
+<link rel="stylesheet" href="/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.1/css/select.dataTables.min.css">
+<script src="/js/libs/date.format.js"></script>
+<script src="/js/libs/jquery-dropdate.js"></script>
+<link rel="stylesheet" href="/plugins/iCheck/square/blue.css">
+<script src="/plugins/iCheck/icheck.js"></script>
+</head>
+<body class="skin-blue sidebar-mini sidebar-collapse">
+  <div class="wrapper">
+    <% include partials/admin_navbar %>
+    <% include partials/admin_sidebar %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1 style="display: inline;">
+          使用者管理
+          <small>User management</small>
+        </h1>
+
+        <button type="button" class="btn waves-effect checkin-btn"><a href="/register_unknown">註冊使用者</a></button>
+
+        <ol class="breadcrumb">
+          <li><a href="/manageUsers"><i class="fa fa-users"></i> 使用者管理</a></li>
+        </ol>
+      </section>
+
+      <!-- Main content -->
+      <section class="content container-fluid">
+        <div class="alert alert-success" style="display: none;"></div>
+        <div class="alert alert-danger" style="display: none;"></div>
+        <div class="alert alert-warning" style="display: none;"></div>
+        <div class="row">
+          <% include partials/userList %>
+          <div id="profile" class="col-lg-5" style="display: none; margin: 0; padding-left:0; padding-right: 5px;">
+            <!-- Profile Image -->
+            <div class="box box-primary" style="display: inline-block;">
+              <div class="box-body box-profile">
+                <img class="profile-user-img img-responsive img-circle" src="" alt="User profile picture"  style="display: inline-block; margin-left: 200px; margin-right: 100px;">
+
+                <div class="btn-group" style="float: right;">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    Action <span class="fa fa-caret-down"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu" style="min-width: 80px;">
+                    <li id="edit"><a data-toggle="modal" data-target="#profileModal">Edit</a></li>
+                    <li id="delete"><a style="color: red;" data-toggle="modal" data-target="#deleteModal">Delete</a></li>
+                  </ul>
+                </div>
+
+                <h3 class="profile-name text-center" style="margin-top: 10px; margin-bottom: 3px;"></h3>
+
+                <p class="profile-username text-muted text-center" style="margin-top: 0px; font-size: 15px; margin-bottom: 3px;"></p>
+
+                <ul class="nav nav-tabs nav-tab nav-justified" id="myTab">
+                  <li class="active"><a class="tab-btn" href="#profile-info" data-toggle="tab">Info</a></li>
+                  <li><a class="tab-btn" href="#total-scores" data-toggle="tab">Scores</a></li>
+                  <li><a class="tab-btn" href="#relations" data-toggle="tab">Relations</a></li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane fade in active" id="profile-info">
+                    <ul class="list-group list-group-unbordered">
+                      <li class="list-group-item">
+                        <b>Gender</b> <a class="profile-gender" class="pull-right"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>Age</b> <a class="profile-age" class="pull-right"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>Joined Time</b> <a class="profile-registered-time" class="pull-right"></a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="tab-pane fade" id="total-scores">
+                  <p>Reprehenderit butcher retro keffiyeh dreamcatcher synth.</p>
+                  </div>
+                  <div class="tab-pane fade" id="relations">
+                  </div>
+                </div>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+            <!-- Modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                  </div>
+                  <div class="modal-body text-center">
+                    確定要刪除此使用者？
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" id="confirm" class="btn btn-primary">確定</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div id="task-area" class="col-sm-12 col-md-12 col-lg-8" style="display: none;">
+            <div class="box box-info">
+              <div class="box-header">
+                <h3 class="box-title">Task List</h3>
+                <div class="btn-group" style="margin-left: 20px;">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    Action <span class="fa fa-caret-down"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li id="select"><a>Select</a></li>
+                    <li id="cancel" style="display: none;"><a>Cancel</a></li>
+                    <li id="newTask"><a data-toggle="modal" data-target="#createModal">New Task</a><li>
+                    <li id="delete" style="display: none;"><a style="color: red;" data-toggle="modal" data-target="#deleteTaskModal">Delete</a></li>
+                  </ul>
+                </div>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <table id="taskList" class="table table-bordered table-hover dataTable" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th style="display: none;"></th>
+                      <th style="width: 150px;"> ID </th>
+                      <th style="width: 80px;">Applicant_id</th>
+                      <th style="width: 100px;">Type</th>
+                      <th>Content</th>
+                      <th style="width: 50px;">Urgency</th>
+                      <th style="width: 180px;">CreatedAt</th>
+                      <th style="width: 80px;">Done</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+            <!-- Modal -->
+            <div class="modal fade" id="deleteTaskModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                  </div>
+                  <div class="modal-body text-center">
+                    確定要刪除選取的事項？
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" id="confirm" class="btn btn-primary">確定</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header bg-info">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <span style="font-size: 15px;">新增事項</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                  </div>
+                  <div class="modal-body text-center">
+                    <div class="alert blur-alert bg-success" style="display: none;">類別新增成功</div>
+                    <div class="alert blur-alert bg-danger" style="display: none;">類別新增失敗</div>
+                    <div class="alert blur-alert bg-warning" style="display: none;">資料填寫不完全</div>
+                    <div class="box box-info">
+                      <div class="box-body">
+                        <div class="input-group" style="margin-bottom: 20px;">
+                          <label>類別：</label>
+                          <select>
+                            <option></option>
+                            <% taskTypes.forEach(function(element){ %>
+                              <option value="<%= element.type %>"><%= element.type %></option>
+                            <% }) %>
+                          </select>
+                          <input type="text" id="newTaskType" class="input-sm" style="margin-left: 10px; width: 100px;"><button id="createTaskType" class="btn btn-default btn-sm" style="margin-left: 10px;"><i class="fa fa-plus" aria-hidden="true"></i> 新增類別</button>
+                        </div>
+                        <div id="urgency" class="input-group" style="margin-bottom: 20px;">
+                          <label>重要程度：</label>
+                          <input type="radio" name="urgency" value="critical" id="critical"><label for="critical" style="margin-left: 5px; margin-right: 10px;">
+                            <span class="badge bg-red">Critical</span>
+                          </label>
+                          <input type="radio" name="urgency" value="normal" id="normal"><label for="normal" style="margin-left: 5px; margin-right: 10px;">
+                            <span class="badge bg-yellow">Normal</span>
+                          </label>
+                          <input type="radio" name="urgency" value="low" id="low"><label for="low" style="margin-left: 5px;">
+                            <span class="badge bg-green">Low</span>
+                          </label>
+                        </div>
+                        <div class="input-group">
+                          <label for="content">內容：</label>
+                          <textarea id="content" style="vertical-align: top; width: 400px;" rows="3" name="content" placeholder="Enter..."></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer" style="padding-top: 0px;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" id="submit" class="btn btn-primary">送出</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+
+        </div>
+
+        <div class="row">
+          <div id="relationList" class="col-xs-12 col-md-6 col-lg-4" style="display: none;">
+            <div class="box">
+              <div class="box-header">
+                <h3 class="box-title">Relatives</h3>
+
+                <div class="box-tools">
+                  <button type="button" class="btn btn-block btn-default"><span class="fa fa-plus"></span></button>
+                </div>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body no-padding">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Intimacy</th>
+                      <th>Relation</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header bg-info">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <span style="font-size: 15px;">個人資料</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+              </div>
+              <div class="modal-body">
+                <div class="alert bg-info" style="display: none;">更新中......請稍後</div>
+                <div id="profile-success" class="alert blur-alert bg-success" style="display: none;">更新成功</div>
+                <div id="profile-error" class="alert blur-alert bg-danger" style="display: none;">更新失敗</div>
+                <div id="img_success" class="alert blur-alert bg-success" style="display: none;">頭貼更新成功</div>
+                <div id="img_error" class="alert blur-alert bg-danger" style="display: none;">頭貼更新失敗</div>
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" style="text-align: center;">
+                    <h4 style="display: inline;">個人資料</h4>
+                    <span id="edit-profile" style="float: right; cursor: pointer;"><i class="fa fa-lg fa-pencil-square-o hover-change"></i></span>
+                    <span id="save-profile" style="float: right; cursor: pointer; padding-left: 5px; padding-right: 5px; display: none;"><i class="fa fa-lg fa-floppy-o hover-change"></i></span>
+                    <span id="cancel-edit" style="float: right; cursor: pointer; padding-left: 5px; padding-right: 5px; margin-left: 10px; display: none;"><i class="fa fa-lg fa-times hover-change"></i></span>
+                  </div>
+                  <table class="table" cellspacing="0" width="100%">
+                    <thead>
+                      <tr>
+                        <td id="profile-avatar" colspan="4" align="center">
+                          <img src="" alt="No profile picture" style="padding-top: 10px; padding-bottom: 10px; max-width: 300px; max-height: 250px;"></img>
+                        </td>
+                        <td id="upload_photo" colspan="4" align="center" style="display: none;">
+                          <img id="cover-preview" class="img-thumbnail" src="" alt="No profile picture" style="padding-top: 10px; padding-bottom: 10px; max-width: 300px; max-height: 250px; margin-bottom: 20px;"><br>
+                          <input id="input_img"  style="width: 200px;" type="file" name="avatar" onchange="readURL(this);" accept="image/jpeg" />
+                          <button id="remove_photo" class="btn btn-default" onclick="removeCover()" style="padding-top: 0px; padding-bottom: 0px;">移除</button>
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th>UserID</th><td class="profile-userid"></td>
+                        <th>Name</th><td class="profile-name"></td>
+                        <td class="edit-input" style="display: none;"><input type='text'/></td>
+                      </tr>
+                      <tr>
+                        <th>Username</th><td class="profile-username-plain"></td>
+                        <td class="edit-input" style="display: none;"><input type='text'/></td>
+                        <th>Password</th><td class="profile-password">**********</td>
+                        <td class="edit-input" style="display: none;"><input type='password'/></td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th><td class="profile-gender"></td>
+                        <td class="edit-input" style="display: none;">
+                          <select id="select-gender" class="form-control" style="width: auto;">
+                            <option value="F">F</option>
+                            <option value="M">M</option>
+                          </select>
+                        </td>
+                        <th>Birth</th><td class="profile-birth"></td>
+                        <td class="edit-input edit-birth" style="display: none;"><input type="text" name="birth" value="" class="dropdate"></td>
+                      </tr>
+                      <tr>
+                        <th>Role</th><td class="profile-role"></td>
+                        <td class="edit-input" style="display: none;">
+                          <select id="select-role" class="form-control" style="width: auto;">
+                            <option value="一般使用者">一般使用者</option>
+                            <option value="家屬">家屬</option>
+                            <option value="管理員">管理員</option>
+                            <option value="未註冊">未註冊</option>
+                            <option value="未知">未知</option>
+                          </select>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th colspan="1">Email</th>
+                        <td class="profile-email" colspan="3"></td>
+                        <td class="edit-input" colspan="3" style="display: none;"><input type='email' style="width: 100%"></td>
+                      </tr>
+                      <tr>
+                        <th colspan="1">Registered Time</th>
+                        <td class="profile-registered-time" colspan="3"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.panel -->
+
+              </div>
+              <div class="modal-footer" style="padding-top: 0px;">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include partials/admin_footer %>
+    <% include partials/admin_control_sidebar %>
+  </div>
+  <!-- /.wrapper -->
+  <script src="/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/select/1.2.1/js/dataTables.select.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.0/js/dataTables.responsive.min.js"></script>
+  <script src="/js/admin/manage_users.js"></script>
+</body>
+</html>

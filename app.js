@@ -1,6 +1,7 @@
 var express=require('express');
-var app=express();
-var port = process.env.port || 8000;
+var app = express();
+//var ports = [8000, 8087, 8081];
+var ports = [8000];
 
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
@@ -15,9 +16,12 @@ var flash = require('connect-flash');
 var MongoStore = require('connect-mongo')(session);
 var mongoose = require('mongoose');
 var autoIncrement = require('mongoose-auto-increment');
+var moment = require('moment');
+var User = require('./models/user').User;
+var Task = require('./models/task').Task;
 
 var configDB = require('./config/database.js');
-mongoose.connect(configDB.url,function(err){
+mongoose.connect(configDB.url, { useMongoClient: true }, function(err){
 	if(err) console.log(err);
 	else console.log('Connected to mongodb!');
 });
@@ -29,18 +33,25 @@ autoIncrement.initialize(db);
 
 connections=[];
 
-var server=require('http').createServer(app).listen(port);
-var io=require('socket.io').listen(server);
-require('./sockets')(io);
-console.log('Server running on port : ' + port );
+ports.forEach(function(port){
+	var server = require('http').createServer(app).listen(port);
+	var io = require('socket.io').listen(server);
+	require('./sockets')(io);
+	console.log('Server running on port : ' + port);
+});
 
 var routes = require('./routes/index');
 var api = require('./routes/api');
-//var imageFile = require('./routes/imageFile');
 var activity = require('./routes/activity');
 var hueLight = require('./routes/hueLight');
 var photos = require('./routes/photos');
 var admin = require('./routes/admin');
+var admin_tasks = require('./routes/admin_tasks');
+var getCSV = require('./routes/admin_csv');
+var admin_albums = require('./routes/admin_photos');
+var raspi = require('./routes/raspi');
+var manageUsers = require('./routes/admin_users');
+var manageActivities = require('./routes/admin_activity');
 var strokeTest = require('./routes/strokeTest');
 var magicMirror = require('./routes/magicMirror');
 
@@ -89,15 +100,22 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 // Global Vars
 app.use(function (req, res, next) {
   res.locals.success_msg = req.flash('success_msg')[0];
+	res.locals.img_error = req.flash('img_error')[0];
   res.locals.error_msg = req.flash('error_msg')[0];
-  res.locals.error = req.flash('error')[0];
+  res.locals.errors = req.flash('errors');
   res.locals.user = req.user || null;
 	res.locals.role = null;
+	res.locals.moment = moment;
 	if(req.user){
 		res.locals.role = req.user.role;
-		//console.log(req.user.role);
+		User.findOne({userID: req.user.userID}).populate('profile_picture').exec(function(err, doc){
+			if(err) console.log(err);
+			else res.locals.profilePath = doc.profile_picture.path;
+			next();
+		});
 	}
-  next();
+	else next();
+
 });
 
 app.use('/', routes);
@@ -107,5 +125,11 @@ app.use('/activity', activity);
 app.use('/photos', photos);
 app.use('/strokeTest', strokeTest);
 app.use('/admin', admin);
+app.use('/admin/tasks', admin_tasks);
+app.use('/admin/raspi', raspi);
+app.use('/admin/getCSV', getCSV);
+app.use('/admin/manageUsers', manageUsers);
+app.use('/admin/manageActivities', manageActivities);
+app.use('/admin/album', admin_albums);
 app.use('/hueLight', hueLight);
 app.use('/magicMirror', magicMirror);

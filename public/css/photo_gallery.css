@@ -1,0 +1,122 @@
+body {
+    background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
+    min-height: 100vh;
+    font: normal 16px sans-serif;
+}
+
+.gallery-container h1 {
+    text-align: center;
+    margin-top: 30px;
+    font-family: 'Droid Sans', sans-serif;
+    font-weight: bold;
+    color: #58595a;
+}
+
+.gallery-container p.page-description {
+    text-align: center;
+    margin: 30px auto;
+    font-size: 18px;
+    color: #85878c;
+}
+
+.tz-gallery {
+    padding: 40px;
+}
+
+.tz-gallery .thumbnail {
+    margin-bottom: 30px;
+    padding: 6px;
+    background-color: #fff;
+    border-radius: 4px;
+    transition: 0.15s ease-in-out;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.06);
+}
+
+.tz-gallery .thumbnail:hover {
+    transform: translateY(-10px) scale(1.02);
+}
+
+.tz-gallery .lightbox img {
+    border-radius: 4px 4px 0 0;
+}
+
+.baguetteBox-button {
+    background-color: transparent !important;
+}
+
+.btn-group li {
+  cursor: pointer;
+}
+
+#deleteModal .modal-header{
+  background-color: rgba(232,86,86,.85);
+  color: #fff;
+}
+
+#deleteAlbumModal .modal-header{
+  background-color: rgba(232,86,86,.85);
+  color: #fff;
+}
+
+.modal-content {
+  border-radius: 5px;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,.5);
+}
+
+.modal-header {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 15px;
+}
+
+.modal-title {
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.modal-body {
+  position: relative;
+  padding: 15px;
+  font-size: 15px;
+}
+
+.modal h5 {
+  font-size: 20px;;
+  font-weight: 500;
+  padding-top: 5px;
+  display: inline;
+}
+
+.modal .close {
+  float: right;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: .5;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
+
+.modal-footer {
+  border: none;
+  padding-top: 0;
+  padding: 15px;
+  text-align: right;
+}
+
+.modal-backdrop{
+  opacity:1;
+}
+
+img.crop {
+  object-fit: cover;
+}
+
+img {
+  image-orientation: from-image;
+}

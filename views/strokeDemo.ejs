@@ -1,0 +1,190 @@
+<% include partials/head %>
+    <title>Face to Face</title>
+    <script async src="/js/libs/brf/BRFv4_JS_trial.js"></script>
+    <style>
+    body {
+      font-size: 18px;
+    }
+    </style>
+  </head>
+  <body>
+    <% include partials/navbar %>
+    <div class="container" style="margin-top: 60px;">
+      <div class="row" id="wrapper">
+        <div class="col-lg-10 col-md-10 col-sm-12" style="width:680px;height:480px;">
+          <canvas id="image_canvas"></canvas>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-12">
+          <div style="height:10em; line-height: 1.5;">
+            <strong>偵測結果</strong>
+            <div id="results" style="word-wrap:break-word; margin-top: 10px;"></div>
+          </div>
+          <div>
+            <strong>偵測器訊息</strong>
+          </div>
+          <div id="logs" style="padding-bottom: 100px; margin-top: 10px; line-height: 1.5;"></div>
+        </div>
+      </div>
+		  <input id="upload_button" type="file" accept="image/*" onchange="loadFile(event)" style="visibility: hidden; padding-bottom: 20px; margin-top: 10px;">
+    </div>
+    <% include partials/footer %>
+    <script>
+    var imageData	= document.getElementById("image_canvas");	// image data for BRFv4
+
+    var brfManager	 = null;
+    var resolution	 = null;
+    var brfv4		= null;
+
+    log("#logs", "偵測系統啟動中......");
+
+    //Load the selected image
+    function loadFile(event) {
+      $('#results').html("");
+      var img = new Image();
+      var reader = new FileReader();
+      reader.onload = function() {
+        img.onload = imageLoaded;
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    //Once the image is loaded, pass it down for processing
+    function imageLoaded(event) {
+
+      var contxt = document.createElement('canvas').getContext('2d');
+      contxt.clearRect(0, 0, contxt.canvas.width, contxt.canvas.height);
+      contxt.canvas.width = 640;
+      contxt.canvas.height = 480;
+      var scaleX = contxt.canvas.width / this.width;
+      var scaleY = contxt.canvas.height / this.height;
+      var ratio  = Math.min ( scaleX, scaleY );
+      contxt.drawImage(this, 0, 0,  this.width, this.height, 0, 0, this.width*ratio, this.height*ratio);
+      var image = new Image();
+      image.src = contxt.canvas.toDataURL("image/png");
+
+      trackFaces(image);
+    }
+
+    window.onload = function(){
+
+      waitForSDK();
+
+      function waitForSDK() {
+
+        if(brfv4 === null) {
+          brfv4 = {locateFile: function() { return "js/libs/brf/BRFv4_JS_trial.js.mem"; }};
+          initializeBRF(brfv4);
+        }
+
+        if(brfv4.sdkReady) {
+          initSDK();
+        } else {
+          setTimeout(waitForSDK, 100);
+        }
+      }
+
+      function initSDK() {
+        log('#logs', "偵測系統啟動完成！請開始拍照偵測!");
+        $("#upload_button").css("visibility", "visible");
+
+        // Resize the canvas to match the webcam video size.
+        imageData.width		= 640;
+        imageData.height	= 480;
+
+        resolution	= new brfv4.Rectangle(0, 0, imageData.width, imageData.height);
+
+        brfManager	= new brfv4.BRFManager();
+        brfManager.init(resolution, resolution, "com.tastenkunst.brfv4.js.examples.minimal.image");
+
+
+      }
+    };
+
+    function trackFaces(image) {
+      var imageDataCtx = imageData.getContext("2d");
+
+      imageDataCtx.clearRect(0, 0, 640, 480);
+
+      image.onload = function(){
+        imageDataCtx.drawImage(image, 0, 0, resolution.width, resolution.height);
+
+        var data = imageDataCtx.getImageData(0, 0, resolution.width, resolution.height).data;
+
+        for(var i = 0; i < 10; i++) {
+          brfManager.update(data);
+        }
+
+        var faces = brfManager.getFaces();
+
+        for(i = 0; i < faces.length; i++) {
+
+          var face = faces[i];
+
+          if(face.state === brfv4.BRFState.FACE_TRACKING_START ||
+            face.state === brfv4.BRFState.FACE_TRACKING) {
+
+              imageDataCtx.strokeStyle="#00a0ff";
+
+              for(var k = 0; k < face.vertices.length; k += 2) {
+                imageDataCtx.beginPath();
+                imageDataCtx.arc(face.vertices[k], face.vertices[k + 1], 2, 0, 2 * Math.PI);
+                imageDataCtx.stroke();
+              }
+
+              //deviation of angle of mouth
+              var points = [48*2 , 54*2, 8*2, 27*2]; //[Right Lip Corner, Left Lip Corner, Upper Lip Center, Lower Lip Center]
+              var m1 = getSlope(face.vertices[points[0]], face.vertices[points[0] + 1],
+    						face.vertices[points[1]], face.vertices[points[1] + 1]);
+    					var m2 = getSlope(face.vertices[points[2]], face.vertices[points[2] + 1],
+    						face.vertices[points[3]], face.vertices[points[3] + 1]);
+
+    					var deg = calcAngle(m1, m2);
+    					angle = Math.abs(90 - deg);
+    					if(face.vertices[points[0] + 1] < face.vertices[points[1] + 1]){
+    						log('#results', "順時針傾斜(左高右低): " + angle.toFixed(2) + "°");
+    						angle *= (-1);
+    					}
+    					else log('#results', "逆時針傾斜(右高左低): " + angle.toFixed(2) + "°");
+
+    					drawLine(face.vertices[points[0]], face.vertices[points[0] + 1],
+    						face.vertices[points[1]], face.vertices[points[1] + 1]);
+    					drawLine(face.vertices[points[2]], face.vertices[points[2] + 1],
+    						face.vertices[points[3]], face.vertices[points[3] + 1]);
+              }
+              else{
+                log('#results', "偵測不到臉!");
+              }
+            }
+          };
+        }
+
+
+        function log(node_name, msg) {
+          $(node_name).append("<span>" + msg + "</span><br />");
+        }
+
+        function getSlope(p0_x, p0_y, p1_x, p1_y){
+          var m = (p0_y - p1_y)/(p0_x - p1_x);
+          return m;
+        }
+
+        function calcAngle(m1, m2){
+          if(m1*m2 == -1) return 90;
+          var rad2deg = 180/Math.PI;
+          var degrees = Math.atan(Math.abs((m1 - m2)/(1 + m1*m2)))*rad2deg;
+          return degrees;
+        }
+
+        function drawLine(p0_x, p0_y, p1_x, p1_y){
+          var contxt = $('#image_canvas')[0].getContext('2d');
+          contxt.strokeStyle = "red";
+          contxt.lineWidth = 1;
+          contxt.beginPath();
+          contxt.moveTo(p0_x, p0_y);
+          contxt.lineTo(p1_x, p1_y);
+          contxt.stroke();
+        }
+    </script>
+  </body>
+</html>

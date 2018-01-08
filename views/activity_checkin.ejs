@@ -1,0 +1,142 @@
+<% include partials/head %>
+<title>活動報到</title>
+<script type="text/javascript" src="/bower_components/webcamjs/webcam.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.2/moment.min.js"></script>
+<link rel="stylesheet" href="/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.1/css/select.dataTables.min.css">
+<!-- SlimScroll -->
+<script src="/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.3.7/mobile-detect.min.js"></script>
+<link href="/css/checkin.css" rel="stylesheet">
+<style type="text/css">
+    #my_camera{
+      margin-right: auto;
+      margin-left: auto;
+    }
+
+    #shot,
+    #reshot,
+    #submit_photo{
+      justify-content: center;
+      margin-top: 10px;
+      padding: 3px 8px;
+    }
+</style>
+</head>
+<body>
+  <% include partials/navbar %>
+  <div class="container">
+    <h2><%= activity_title %> 臉部識別報到</h2>
+    <ul class="nav nav-pills">
+      <li class="active"><a href="#manual_mode" data-toggle="tab">手動模式</a></li>
+      <li><a href="#auto_mode" data-toggle="tab">自動模式</a></li>
+      <li><a href="#keyin" data-toggle="modal" data-target="#checkin-modal">手動輸入</a></li>
+      <!--<li class="active"><a href="#nonRealTime" data-toggle="tab">非即時模式</a></li>-->
+    </ul>
+    <div id="checkin-modal" class="modal fade">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h2 class="text-left"><b>手動輸入</b></h2>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class = "form-group">
+                <label> 帳號 </label>
+                <input id="form-username" type="text" class="form-control" name="username" placeholder="帳號">
+              </div>
+              <div class = "form-group">
+                <label> 密碼 </label>
+                <input id="form-password" type="password" class="form-control" name="password" placeholder="密碼">
+              </div>
+              <div class = "form-group">
+                <button id="submitForm" class = "btn btn-primary"> 送出 </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <a href="" class="btn btn-default" data-dismiss="modal">Close</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="alert alert-info" role="alert" id="countdown" style="display: none;"></div>
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7" style="text-align: center;">
+            <div id="my_camera"></div>
+            <input id="shot" class="btn btn-default" type=button value="拍照" onClick="preview_snapshot()">
+            <input id="reshot" style="display: none;" class="btn btn-default" type=button value="重拍" onClick="cancel_preview()">
+            <input id="submit_photo" style="display: none;" class="btn btn-default" type=button value="送出" onClick="submit()">
+            <hr>
+            <span id="message"></span>
+            <div class="row" id="user_profile" style="display: none; margin-top: 10px;">
+              <p>User ID：<span id="user_id"></span></p>
+              <p>Username：<span id="username"></span></p>
+              <p>Name：<span id="name"></span></p>
+              <p>Gender：<span id="gender"></span></p>
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5">
+            <ul class="nav nav-tabs nav-justified" style="margin-bottom: 20px;">
+              <li class="active" ><a href="#checklist" data-toggle="tab">已報到</a></li>
+              <li><a href="#uncheckedList" data-toggle="tab">未報到</a></li>
+            </ul>
+            <div class="tab-content">
+              <div id="checklist" class="tab-pane fade in active">
+                <table class="table dataTable table-hover" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th>Username</th>
+                      <th>Name</th>
+                      <th>Checked In Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (checked.length > 0 ) {%>
+                      <% checked.forEach(function(user){ %>
+                        <tr>
+                          <td><%= user.username %></td>
+                          <td><%= user.name %></td>
+                          <td><%= moment(user.checkInTime).format('YYYY/MM/DD hh:mm:ss') %> </td>
+                        </tr>
+                      <% }); %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <div id="uncheckedList" class="tab-pane fade">
+                <table id="unchecked" class="table dataTable table-hover" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th>Username</th>
+                      <th>Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (unchecked.length > 0) {%>
+                      <% unchecked.forEach(function(user){ %>
+                        <tr>
+                          <td><%= user.username %></td>
+                          <td><%= user.name %></td>
+                        </tr>
+                      <% }); %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script type="text/javascript" src="/js/checkin.js"></script>
+  <% include partials/footer %>
+</body>
+</html>

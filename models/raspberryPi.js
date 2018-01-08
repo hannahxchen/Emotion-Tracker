@@ -1,24 +1,35 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var autoIncrement = require('mongoose-auto-increment');
-var rpi_prefix = 'rpi_';
-var sensor_prefix = 'data_';
+var ObjectId = mongoose.Schema.ObjectId;
 
 var RaspberryPiSchema = mongoose.Schema({
   location: String
 });
 
 var SensorDataSchema = mongoose.Schema({
-  raspberryPi_id: String,
+  raspberryPi: {type: ObjectId, ref: 'RaspberryPi'},
   temperature: Number,
   humidity: Number,
   pm25: Number,
-  co2: Number
+  co2: Number,
+  detected_time: Date
 });
 
-autoIncrement.initialize(mongoose.connection);
-RaspberryPiSchema.plugin(autoIncrement.plugin, { model: 'RaspberryPi', prefix: rpi_prefix, field: 'rpiID' });
-SensorDataSchema.plugin(autoIncrement.plugin, { model: 'SensorData', prefix: sensor_prefix, field: 'sensorDataID' });
+var RaspiLogSchema = mongoose.Schema({
+  user_id: String,
+  raspberryPi: {type: ObjectId, ref: 'RaspberryPi'},
+  emotion_id: [{type: ObjectId, ref: 'Emotion'}],
+  appear_time: Date,
+  disappear_time: Date
+});
+
+var LogImgTmpSchema = mongoose.Schema({
+  log: {type: ObjectId, ref: 'RaspiLog'},
+  image_folder: String
+});
+
 
 var RaspberryPi = module.exports.RaspberryPi = mongoose.model('RaspberryPi', RaspberryPiSchema);
 var SensorData = module.exports.SensorData = mongoose.model('SensorData', SensorDataSchema);
+var RaspiLog = module.exports.RaspiLog = mongoose.model ('RaspiLog', RaspiLogSchema);
+var LogImgTmp = module.exports.LogImgTmp = mongoose.model ('LogImgTmp', LogImgTmpSchema);

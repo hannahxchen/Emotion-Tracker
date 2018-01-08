@@ -29,6 +29,8 @@ module.exports = function(passport) {
       user_.validPassword(password, user.password, function(err, isMatch){
         if(err) throw err;
         if(isMatch){
+          console.log(req.user);
+          req.flash('success_msg', ', welcome back!');
           return done(null, user);
         } else {
           return done(null, false, {message: 'Invalid password'});
@@ -47,6 +49,9 @@ module.exports = function(passport) {
       if(err) throw err;
       if(!user){
         return done(null, false, {message: 'Unknown User'});
+      }
+      else{
+        req.flash('success_msg', ', welcome back!');
       }
       return done(null, user);
     });

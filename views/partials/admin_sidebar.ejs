@@ -1,0 +1,57 @@
+<!-- Left side column. contains the logo and sidebar -->
+<aside class="main-sidebar">
+
+  <!-- sidebar: style can be found in sidebar.less -->
+  <section class="sidebar">
+
+    <!-- Sidebar user panel (optional) -->
+    <div class="user-panel">
+      <div class="pull-left image">
+        <img src="<%= profilePath %>" class="img-circle" alt="User Image">
+      </div>
+      <div class="pull-left info">
+        <p><%= user.name %></p>
+        <!-- Status -->
+        <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+      </div>
+    </div>
+
+    <!-- search form (Optional) -->
+    <form action="#" method="get" class="sidebar-form">
+      <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search...">
+        <span class="input-group-btn">
+          <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+          </button>
+        </span>
+      </div>
+    </form>
+    <!-- /.search form -->
+
+    <!-- Sidebar Menu -->
+    <ul class="sidebar-menu" data-widget="tree">
+      <li class="header">Tool</li>
+      <li class="active"><a href="#"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+      <li><a href="/admin/tasks"><i class="fa fa-tasks"></i> <span>待辦事項</span></a></li>
+      <li class="header">Management</li>
+      <li><a href="/admin/manageUsers"><i class="fa fa-users"></i><span>使用者管理</span></a></li>
+      <li><a href="/admin/manageActivities"><i class="fa fa-connectdevelop"></i><span>活動管理</span></a></li>
+      <li><a href="/admin/album"><i class="fa fa-picture-o"></i><span>相簿管理</span></a></li>
+      <li><a href="#"><i class="fa fa-clipboard"></i><span>腦中風紀錄</span></a></li>
+      <li class="treeview">
+        <a href="#"><i class="fa fa-camera"></i><span>鏡頭監控</span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li><a href="/admin/raspi">Log管理分析</a></li>
+          <li><a href="/admin/raspi/settings">裝置管理</a></li>
+        </ul>
+      </li>
+      <li><a href="/admin/getCSV"><i class="fa fa-cloud-download"></i><span>下載資料</span></a></li>
+    </ul>
+    <!-- /.sidebar-menu -->
+  </section>
+  <!-- /.sidebar -->
+</aside>

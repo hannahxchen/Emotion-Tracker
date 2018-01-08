@@ -1,0 +1,167 @@
+<% include partials/admin_header %>
+<link rel="stylesheet" href="/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.1/css/select.dataTables.min.css">
+</head>
+<body class="skin-blue sidebar-mini sidebar-collapse">
+  <div class="wrapper">
+    <header class="main-header">
+      <% include partials/admin_navbar %>
+    </header>
+    <% include partials/admin_sidebar %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          未知使用者管理
+          <small>Optional description</small>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="/manageUsers"><i class="fa fa-dashboard"></i> 使用者管理</a></li>
+          <li class="active">未知使用者</li>
+        </ol>
+      </section>
+
+      <!-- Main content -->
+      <section class="content container-fixed">
+        <div class="row">
+          <div id="unknownUserList" class="col-xs-12 col-md-12 col-lg-6">
+            <div class="box">
+              <div class="box-header">
+                <h3 class="box-title">Unknown User List</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <table id="unknownUserTable" class="table table-bordered table-hover dataTable" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th style="display: none;"></th>
+                      <th>UserID</th>
+                      <th>Gender</th>
+                      <th>Name</th>
+                      <th>CreatedAt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (users) { %>
+                      <% users.forEach(function(user){ %>
+                        <tr>
+                          <td style="display: none;"></td>
+                          <td><%= user.userID %></td>
+                          <td><%= user.gender %></td>
+                          <% if(user.name) { %>
+                            <td><%= user.name %></td>
+                          <% } else{ %>
+                            <td>Unknown</td>
+                          <% } %>
+                            <td><%= moment(user.createdAt).format('YYYY-MM-DD hh:mm:ss') %></td>
+                        </tr>
+                      <% }) %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+          </div>
+
+          <div id="profile" class="col-xs-12 col-md-12 col-lg-5" style="display: none; padding-left: 0px;">
+            <!-- Widget: user widget style 1 -->
+            <div class="box box-widget widget-user">
+              <!-- Add the bg color to the header using any of the bg-* classes -->
+              <div class="widget-user-header bg-aqua-active">
+                <h3 class="widget-user-name" style="font-size: 22px;"></h3>
+                <input id="edit-name" class="form-control" type="text" placeholder="name" style="display: none; width: 100px; margin-top: 20px;">
+                <div class="btn-group" style="float: right;">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    Action <span class="fa fa-caret-down"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li id="edit"><a>Edit</a></li>
+                    <li id="log"><a>Log</a></li>
+                    <li class="divider"></li>
+                    <li id="delete"><a style="color: red;" data-toggle="modal" data-target="#deleteModal">Delete</a></li>
+                  </ul>
+                </div>
+                <h5 class="widget-user-username" style="font-size: 20px; font-style: italic;"></h5>
+                <input id="edit-username" class="form-control" type="text" placeholder="username" style="display: none; width: 100px; margin-top: 5px;">
+                <button id="cancel" class="btn-xs btn-default" style="display: none; margin-left: 5px;"><span class="fa fa-times"></span></button>
+                <button id="save" class="btn-xs btn-default" style="display: none;"><span class="fa fa-save"></span></button>
+              </div>
+
+              <div class="widget-user-image">
+                <img class="img-circle" src="" alt="User Avatar">
+              </div>
+              <div class="box-footer">
+                <div class="row">
+                  <div class="col-sm-4 border-right">
+                    <div class="description-block">
+                      <h5 class="profile-age"></h5>
+                      <span class="description-text">AGE</span>
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-4 border-right">
+                    <div class="description-block">
+                      <h5 class="profile-emotion-score">happiness - 0.999</h5>
+                      <span class="description-text">EMOTION</span>
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-4">
+                    <div class="description-block">
+                      <h5 class="profile-gender"></h5>
+                      <select id="edit-gender" style="display: none; width: 100px;">
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                      </select>
+                      <span class="description-text">GENDER</span>
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+              </div>
+            </div>
+            <!-- /.widget-user -->
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+              </div>
+              <div class="modal-body text-center">
+                確定要刪除此使用者？
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" id="confirm" class="btn btn-primary">確定</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include partials/admin_footer %>
+    <% include partials/admin_control_sidebar %>
+  </div>
+  <!-- ./wrapper -->
+  <script src="/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/select/1.2.1/js/dataTables.select.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.0/js/dataTables.responsive.min.js"></script>
+  <script src="/js/admin/manage_unknown.js"></script>
+</body>
+</html>

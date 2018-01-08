@@ -1,40 +1,279 @@
 <% include partials/head %>
-    <title>Profile</title>
+    <title>個人資料</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="/js/libs/date.format.js"></script>
+    <script src="/js/libs/jquery-dropdate.js"></script>
+    <style>
+    .container{
+      margin-top: 80px;
+    }
+    .panel {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hover-change:hover {
+      color: #bfc0c1;
+    }
+
+    </style>
   </head>
   <body>
     <% include partials/navbar %>
     <div class="container">
 
-      <div class="panel panel-default" style="margin-top: 10px; width: 40%">
-        <div class="panel-heading">個人資料</div>
-        <table class="table table-bordered" id="visitor-table">
-          <thead>
-            <tr><td colspan="2" align="center"><img src="<%= user.img_base64 %>" style="width: 35%"/></td></tr>
-            <tr>
-              <th><strong>User ID</strong></th><th><%= user.username %></th>
-            </tr>
-            <tr>
-              <th><strong>姓名</strong></th><th><%= user.name %></th>
-            </tr>
-            <tr>
-              <th><strong>性別</strong></th><th><%= user.gender %></th>
-            </tr>
-            <tr>
-              <th><strong>年齡</strong></th><th><%= user.age %></th>
-            </tr>
-            <tr>
-              <th><strong>Email</strong></th><th><%= user.email %></th>
-            </tr>
-            <tr>
-              <th><strong>註冊時間</strong></th><th><%= moment(user.createdAt).format('YYYY-MM-DD hh:mm:ss a'); %></th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+        <div id="profile-success" class="alert blur-alert bg-success" style="display: none;">更新成功</div>
+        <div id="profile-error" class="alert blur-alert bg-danger" style="display: none;">更新失敗</div>
+        <div id="img_success" class="alert blur-alert bg-success" style="display: none;">頭貼更新成功</div>
+        <div id="img_error" class="alert blur-alert bg-danger" style="display: none;">頭貼更新失敗</div>
+
+        <div id="profile" class="panel panel-default" style="margin-top: 10px;">
+          <div class="panel-heading" style="text-align: center;">
+            <h4 style="display: inline;">個人資料</h4>
+            <span id="edit-profile" style="float: right; cursor: pointer; margin-right: 10px;"><i class="fa fa-lg fa-pencil-square-o hover-change"></i></span>
+            <span id="save-profile" style="float: right; cursor: pointer; padding-left: 5px; padding-right: 5px; margin-right: 10px; display: none;"><i class="fa fa-lg fa-floppy-o hover-change"></i></span>
+            <span id="cancel-edit" style="float: right; cursor: pointer; padding-left: 5px; padding-right: 5px; margin-left: 10px;display: none;"><i class="fa fa-lg fa-times hover-change"></i></span>
+          </div>
+          <table class="table table-bordered" id="visitor-table">
+            <thead>
+              <tr>
+                <td id="profile-avatar" colspan="2" align="center"><img class="thumbnail" src="<%= avatar %>" style="padding-top: 10px; padding-bottom: 10px; max-width: 300px; max-height: 250px;"/></td>
+                <td id="upload_photo" colspan="2" align="center" style="display: none;">
+                  <img id="cover-preview" class="img-thumbnail" src="" alt="No profile picture" style="padding-top: 10px; padding-bottom: 10px; margin-bottom: 20px; max-width: 300px; max-height: 250px;"><br>
+                  <input id="input_img"  style="width: 200px;" type="file" name="avatar" onchange="readURL(this);" accept="image/jpeg" />
+                  <button id="remove_photo" class="btn btn-default" onclick="removeCover()" style="padding-top: 0px; padding-bottom: 0px;">移除</button>
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              <span id="user_id" style="display: none;"><%= user.userID %></span>
+              <tr>
+                <th><strong>姓名</strong></th>
+                <td class="profile-name"><%= user.name %></td>
+                <td class="edit-input" style="display: none;"><input type='text'/></td>
+              </tr>
+              <tr>
+                <th><strong>帳號</strong></th><td class="profile-username-plain"><%= user.username %></td>
+                <td class="edit-input" style="display: none;"><input type='text'/></td>
+              </tr>
+              <tr>
+                <th><strong>密碼</strong></th><td class="profile-password">**********</td>
+                <td class="edit-input" style="display: none;"><input type='password'/></td>
+              </tr>
+              <tr>
+                <th><strong>性別</strong></th>
+                <td class="profile-gender"><%= user.gender %></td>
+                <td class="edit-input" style="display: none;">
+                  <select id="select-gender" class="form-control" style="width: auto;">
+                    <option value="F">F</option>
+                    <option value="M">M</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <th><strong>生日</strong></th>
+                <td class="profile-birth"><%= moment.utc(user.birth).local().format('YYYY/MM/DD') %></td>
+                <td class="edit-input edit-birth" style="display: none;"><input type="text" name="birth" value="" class="dropdate"></td>
+              </tr>
+              <tr>
+                <th><strong>Email</strong></th>
+                <td class="profile-email"><%= user.email %></td>
+                <td class="edit-input" style="display: none;"><input type='email' style="width: 100%"></td>
+              </tr>
+              <tr>
+                <th><strong>註冊時間</strong></th>
+                <td><%= moment.utc(user.createdAt).local().format('YYYY/MM/DD HH:mm:ss'); %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
     <% include partials/footer %>
+    <script>
+    var updates = {};
+    var reader = new FileReader();
+    var img_change = false;
+    var user_id = $('#user_id').text();
+
+    $('.dropdate').dropdate({
+      dateFormat:'yyyy/mm/dd'
+    });
+
+    $('#edit-profile, #save-profile, #cancel-edit').click(function(){
+      $('.bg-success, .bg-danger').hide();
+    });
+
+    function readURL(input){
+      if (input.files && input.files[0]) {
+        reader.onload = function (e) {
+          $('#cover-preview').attr('src', e.target.result);
+          $('#cover-preview').show();
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }else{
+        $('#cover-preview').hide();
+      }
+      img_change = true;
+    }
+
+    function removeCover(){
+      $('#input_img').val('');
+      $('#cover-preview').attr('src', '');
+    }
+
+    $('#edit-profile').click(function(){
+      $(this).hide();
+      $('#cancel-edit').show();
+      $('#save-profile').show();
+      $('.edit-input').each(function(){
+        $(this).prev().hide();
+        $(this).find('input').val($(this).prev().text());
+        $(this).find('select').val($(this).prev().text());
+        $(this).show();
+      });
+      $('.edit-birth').find('select').eq(0).val(moment(Date.parse($('.profile-birth').text())).format('YYYY'));
+      $('.edit-birth').find('select').eq(1).val(moment(Date.parse($('.profile-birth').text())).format('M'));
+      $('.edit-birth').find('select').eq(2).val(moment(Date.parse($('.profile-birth').text())).format('D'));
+      $('#cover-preview').attr('src', $('#profile-avatar img').attr('src'));
+      $('#cover-preview').show();
+      $('#upload_photo').show();
+      $('#profile-avatar').hide();
+      $('#input_img').css('display', 'inline-block');
+    });
+
+    $('#cancel-edit').click(function(){
+      $(this).hide();
+      $('#save-profile').hide();
+      $('#edit-profile').show();
+      $('.edit-input').each(function(){
+        $(this).prev().show();
+        $(this).hide();
+      });
+      $('#upload_photo').hide();
+      $('#profile-avatar').show();
+      img_change = false;
+      updates = {};
+    });
+
+    $('#profile tbody input').focusout(function(){
+      if($(this).val()!= $(this).parent().prev().text()){
+        if($(this).parent().prev().attr('class') == 'profile-name') updates.name = $(this).val();
+        else if($(this).parent().prev().attr('class') == 'profile-username-plain') updates.username = $(this).val();
+        else if($(this).parent().prev().attr('class') == 'profile-password') updates.password = $(this).val();
+        else if($(this).parent().prev().attr('class') == 'profile-email') updates.email = $(this).val();
+      }
+    });
+
+    $('#profile tbody select').change(function(){
+      if($(this).val()!= $(this).parent().prev().text()){
+        if($(this).parent().prev().attr('class') == 'profile-gender') {
+          updates.gender = $(this).val();
+          $(this).parent().prev().text($(this).val());
+        }
+        else if($(this).parent().prev().attr('class') == 'profile-group') {
+          updates.group = $(this).val();
+          $(this).parent().prev().text($(this).val());
+        }
+        else if($(this).parent().prev().attr('class') == 'profile-role') {
+          updates.role = $(this).val();
+          $(this).parent().prev().text($(this).val());
+        }
+        else if($(this).parent().prev().attr('class') == 'profile-birth') {
+          updates.birth = $('.edit-birth').find('input').val();
+        }
+      }
+    });
+
+    $('#save-profile').click(function(){
+      var avatar;
+      console.log(updates);
+
+      if(img_change){
+        if($('#cover-preview').attr('src').length == 0) avatar = false;
+        else avatar = reader.result.replace('data:image/jpeg;base64,', '');
+        $('#profile-avatar img, .profile-user-img').attr('src', reader.result);
+
+        if(avatar){
+          $.ajax({
+            url: '/updateAvatar/'+ user_id,
+            type: 'POST',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify({avatar: avatar}),
+            success: function(result) {
+              if(result.error){
+                $('#img_error').show();
+                if(result.message) $('#img_error').text(result.message);
+                else $('#img_error').text('頭貼更新失敗');
+              }
+              else{
+                $('#img_success').show();
+              }
+            }
+          });
+        }
+      }
+
+      if(!jQuery.isEmptyObject(updates)){
+        $.ajax({
+          url: '/updateProfile/'+ user_id,
+          type: 'POST',
+          contentType: "application/json; charset=utf-8",
+          dataType: "json",
+          data: JSON.stringify({updates: updates}),
+          success: function(result) {
+            if(result.error){
+              $('#profile-error').show();
+            }
+            else{
+              socket.emit('selectUser', {user_id: user_id, getRelations: true});
+
+              $('#profile-success').show();
+            }
+          }
+        });
+      }
+
+      updates = {};
+      $(this).hide();
+      $('#upload_photo').hide();
+      $('#profile-avatar').show();
+      $('#cancel-edit').hide();
+      $('#edit-profile').show();
+      $('.edit-input').each(function(){
+        $(this).prev().show();
+        $(this).hide();
+      });
+      img_change = false;
+    });
+
+    socket.on('userData', function(data){
+      $('.profile-name').text(data.profile.name);
+      $('.profile-userid').text(data.profile.userID);
+      $('.profile-username-plain').text(data.profile.username);
+      $('#profile-avatar img').attr('src', data.profile.profile_picture.path);
+      $('.profile-gender').text(data.profile.gender);
+      $('.profile-email').text(data.profile.email);
+      $('.profile-birth').text(moment.utc(data.profile.birth).local().format('YYYY/MM/DD'));
+      var role;
+      if(data.profile.role == 'elder')
+        role = '一般使用者';
+      else if(data.profile.role == 'relative')
+        role = '家屬';
+      else if(data.profile.role == 'admin')
+        role = '管理員';
+      else if(data.profile.role == 'unregistered')
+        role = '未註冊';
+      else
+        role = '未知';
+
+      $('.profile-role').text(role);
+    });
+
+    </script>
   </body>
 </html>

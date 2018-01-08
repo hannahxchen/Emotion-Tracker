@@ -1,0 +1,451 @@
+<% include partials/admin_header %>
+<!-- DataTables -->
+<link rel="stylesheet" href="/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.1/css/select.dataTables.min.css">
+<link href="/bower_components/jquery-circliful/css/jquery.circliful.css" rel="stylesheet" type="text/css" />
+<script src="/bower_components/waypoints/lib/jquery.waypoints.min.js"></script>
+<script src="/bower_components/jquery-circliful/js/jquery.circliful.min.js"></script>
+<script src="/plugins/counterup/jquery.counterup.min.js"></script>
+<style>
+#recognizeModal tbody tr {
+  cursor: pointer;
+}
+</style>
+</head>
+<body class="skin-blue sidebar-mini sidebar-collapse">
+<div class="wrapper">
+  <header class="main-header">
+    <% include partials/admin_navbar %>
+  </header>
+
+  <% include partials/admin_sidebar %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1 style="display: inline;">
+        <span><%= activity.title %></span>
+        <input type='text' style="display: none;" />
+        <small>(ID : <text><%= activity._id %></text>)</small>
+      </h1>
+
+      <% if(moment.utc().local() < moment.utc(activity.endTime).local().add(1, 'days')) { %>
+        <button type="button" class="btn waves-effect checkin-btn"><a href="/activity/<%= activity._id %>/checkin">開始報到</a></button>
+      <% } %>
+
+      <button type="button" class="btn waves-effect activity-page-btn"><a href="/activity/<%= activity._id %>">活動頁面</a></button>
+      <% if(activity.album){ %>
+        <button type="button" class="btn waves-effect album-page-btn"><a href="/photos/album/<%= activity.album %>">活動相簿</a></button>
+      <% }else{ %>
+        <button type="button" class="btn waves-effect album-page-btn"><a data-toggle="modal" data-target="#albumModal">建立相簿</a></button>
+      <% } %>
+
+      <ol class="breadcrumb">
+        <li><a href="/manageActivities"><i class="fa fa-connectdevelop"></i>活動管理</a></li>
+        <li class="active"><%= activity.title %></a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid" style="margin-top: 5px">
+      <div id="alert-success" class="alert alert-success" style="display: none;"></div>
+      <div id="alert-danger" class="alert alert-danger" style="display: none;"></div>
+      <div id="alert-warning" class="alert alert-warning" style="display: none;"></div>
+      <div class="row">
+        <div class="col-sm-12 col-md-5 col-lg-4 ">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">活動資料</h3>
+              <span id="edit-activity" style="float: right; cursor: pointer;"><i class="fa fa-pencil-square-o hover-change"></i></span>
+              <span id="save-activity" style="float: right; cursor: pointer; padding-left: 5px; padding-right: 5px; display: none;"><i class="fa fa-floppy-o hover-change"></i></span>
+              <span id="cancel-edit" style="float: right; cursor: pointer; padding-left: 5px; padding-right: 5px; margin-left: 10px; display: none;"><i class="fa fa-times hover-change"></i></span>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body no-padding">
+              <table id="activity" class="table" cellspacing="0" width="100%">
+                <thead>
+                  <tr>
+                    <td id="coverPhoto" colspan="2" align="center">
+                      <img src="<%= activity.coverPhoto_path %>" alt="No cover picture" style="padding-top: 10px; padding-bottom: 10px; max-width: 300px; max-height: 250px;"></img>
+                    </td>
+                    <td id="upload_photo" colspan="2" align="center" style="display: none;">
+                      <img id="cover-preview" class="img-thumbnail" src="<%= activity.coverPhoto_path %>" alt="No cover picture" style="padding-top: 10px; padding-bottom: 10px; max-width: 300px; max-height: 250px;"><br>
+                      <input id="input_img"  style="width: 200px;" type="file" name="coverPhoto" onchange="readURL(this);" accept="image/jpeg" />
+                      <button id="remove_photo" class="btn btn-default" onclick="removeCover()" style="padding-top: 0px; padding-bottom: 0px;">移除</button>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="type">
+                    <th>類型</th><td><%= activity.activity_type.type %></td>
+                    <td style="display: none;">
+                      <select id="select-type" class="form-control" style="width: auto;">
+                      <% activity_type.forEach(function(element){ %>
+                          <option value="<%= element.type %>"><%= element.type %></option>
+                      <% }); %>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr id="venue">
+                    <th>地點</th><td><%= activity.venue %></td><td style="display: none;"><input type='text'/></td>
+                  </tr>
+                  <tr id="startTime">
+                    <th>開始時間</th><td><%= moment(activity.startTime).format('YYYY/MM/DD hh:ss A') %></td><td style="display: none;"><input type='datetime-local' step="-1"/></td>
+                  </tr>
+                  <tr id="endTime">
+                    <th>結束時間</th><td><%= moment(activity.endTime).format('YYYY/MM/DD hh:ss A') %></td><td style="display: none;"><input type='datetime-local' step="-1"/></td>
+                  </tr>
+                  <tr id="speaker">
+                    <th>主講者</th><td><%= activity.speaker %></td><td style="display: none;"><input type='text' /></td>
+                  </tr>
+                  <tr id="host">
+                    <th>主辦單位</th><td><%= activity.host %></td><td style="display: none;"><input type='text'  /></td>
+                  </tr>
+                  <tr id="coHost">
+                    <th>協辦單位</th><td><%= activity.coHost %></td><td style="display: none;"><input type='text' /></td>
+                  </tr>
+                  <tr id="quota">
+                    <th>限制人數</th><td><%= activity.quota %></td><td style="display: none;"><input type='number' /></td>
+                  </td>
+                  <tr>
+                    <th colspan="2" style="text-align: center;">聯絡人資訊</th>
+                  </tr>
+                  <tr id="contactPerson">
+                    <th>姓名</th><td><%= activity.contactPerson %></td><td style="display: none;"><input type='text' /></td>
+                  </tr>
+                  <tr id="contactInfo.tel">
+                    <th>電話</th><td><%= activity.contactInfo.tel %></td><td style="display: none;"><input type='tel' /></td>
+                  </tr>
+                  <tr id="contactInfo.email">
+                    <th>Email</th><td><%= activity.contactInfo.email %></td><td style="display: none;"><input type='email' /></td>
+                  </tr>
+                  <tr>
+                    <th colspan="2" style="text-align: center;">活動內容</th>
+                  </tr>
+                  <tr id="content"><td style="display: none;"></td><td colspan="2" style="text-align: center;"><%= activity.content %></td><td colspan="2" style="display: none;"><input type='text'></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+
+        <div class="col-xs-12 col-sm-6 col-lg-3">
+          <div class="card card-box text-right">
+            <div class="circliful-chart circliful" data-dimension="90" data-text="<%= Number(checkIn_ratio.toFixed(2)) %>%" data-width="5" data-fontsize="14" data-percent="<%= checkIn_ratio %>" data-fgcolor="#7266ba" data-bgcolor="#505A66" style="width: 90px;"></div>
+            <h3 class="text-purple counter m-t-10" style="font-size: 24px;"><%= list.checked.length %></h3>
+            <p class="text-muted m-b-10">報到人數</p>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-lg-3">
+          <div class="card card-box text-right">
+            <div class="circliful-chart circliful" data-dimension="90" data-text="<%= Number(enroll_ratio.toFixed(2)) %>%" data-width="5" data-fontsize="14" data-percent="<%= enroll_ratio %>" data-fgcolor="#039cfd" data-bgcolor="#505A66" style="width: 90px;"></div>
+            <h3 class="text-primary counter m-t-10" style="font-size: 24px;"><%= list.checked.length + list.unchecked.length %></h3>
+            <p class="text-muted m-b-10">報名人數</p>
+          </div>
+        </div>
+
+        <div id="checkedIn-list" class="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+          <!-- Custom Tabs -->
+          <div id="tabs" class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li id="check-tab" class="active"><a href="#tab_1" data-toggle="tab">已報到</a></li>
+              <li id="uncheck-tab"><a href="#tab_2" data-toggle="tab">未報到</a></li>
+              <li id="tmp-tab"><a href="#tab_3" data-toggle="tab">現場報到</a></li>
+              <li class="pull-right dropdown" style="float: right;"><a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-gear"></i><span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li id="enroll" data-toggle="modal" data-target="#enrollModal"><a>Enroll New</a></li>
+                  <li id="select"><a>Select</a></li>
+                  <li id="exportCSV"><a href="/admin/getCSV/checkin/<%= activity._id %>" style="color: #666; text-decoration: none;">Export to CSV</a></li>
+                  <li id="cancel" style="display: none;"><a>Cancel</a></li>
+                  <li id="delete" style="display: none;"><a style="color: red;" data-toggle="modal" data-target="#deleteModal">Delete</a></li>
+                </ul>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="tab_1">
+                <table id="checkedList" class="table table-bordered table-hover dataTable" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th style="padding-left: 10px; padding-right: 10px; display: none;"></th>
+                      <th>UserID</th>
+                      <th>Username</th>
+                      <th>Name</th>
+                      <th>Gender</th>
+                      <th>Check-In Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (list.checked.length > 0) {%>
+                      <% list.checked.forEach(function(user){ %>
+                        <tr>
+                          <td style="display: none;"></td>
+                          <td><%= user.user_id %></td>
+                          <td><%= user.data.username %></td>
+                          <td><%= user.data.name %></td>
+                          <td><%= user.data.gender %></td>
+                          <td><%= moment(user.checkInTime).utc().format('YYYY/MM/DD hh:mm:ss') %></td>
+                        </tr>
+                      <% }); %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="tab_2">
+                <table id="uncheckedList" class="table table-bordered table-hover dataTable" width="100%">
+                  <thead>
+                    <tr>
+                      <th style="padding-left: 10px; padding-right: 10px; display: none;"></th>
+                      <th>UserID</th>
+                      <th>Username</th>
+                      <th>Name</th>
+                      <th>Gender</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (list.unchecked.length > 0) {%>
+                      <% list.unchecked.forEach(function(user){ %>
+                        <tr>
+                          <td style="display: none;"></td>
+                          <td><%= user.user_id %></td>
+                          <td><%= user.data.username %></td>
+                          <td><%= user.data.name %></td>
+                          <td><%= user.data.gender %></td>
+                        </tr>
+                      <% }); %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane row" id="tab_3">
+                <div id="tmp-img" class="col-xs-12 col-sm-4 col-md-6 col-lg-5" style="display: inline-block; max-height: 200px;">
+                  <img id="tmp-thumbnail" class="img-thumbnail rounded mx-auto d-block" alt="報到照片" style="margin-left: auto; margin-right: auto; display: block; margin-top: 20px; margin-bottom: 10px;">
+                  <button id="register-user" class="btn btn-sm btn-default" style="display: none;">Register</button>
+                  <button id="known" class="btn btn-sm btn-default" style="display: none;">Known</button>
+                  <button id="recognize" class="btn btn-sm btn-default" style="display: none;">Recognize</button>
+                </div>
+                <div id="tmp-table" class="col-xs-12 col-sm-8 col-md-6 col-lg-7" style="display: inline-block; padding-left: 10px; padding-right: 13px;">
+                  <table id="tmpList" class="table table-bordered table-hover dataTable" cellspacing="0" width="100%">
+                    <thead>
+                      <tr>
+                        <th style="padding-left: 10px; padding-right: 10px; display: none;"></th>
+                        <th style="display: none;"></th>
+                        <th>#</th>
+                        <th>Check-In Time</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (checkintmps.length > 0) {%>
+                        <% for(var i in checkintmps){ %>
+                          <tr id="<%= checkintmps[i]._id %>">
+                            <td style="display: none;"></td>
+                            <td style="display: none;"><%= checkintmps[i].path.replace('./uploads', '') %></td>
+                            <td><%= i %></td>
+                            <td><%= moment(checkintmps[i].checkInTime).utc().format('YYYY/MM/DD hh:mm:ss') %></td>
+                            <td><%= checkintmps[i].status %></td>
+                          </tr>
+                        <% } %>
+                      <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+          </div>
+          <!-- nav-tabs-custom -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.first-row -->
+
+      <!-- Modal -->
+      <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body text-center">
+              確定要刪除選取的資料？
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+              <button type="button" id="confirm" class="btn btn-primary">確定</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="enrollModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">請選擇想要加入的使用者</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+              <table id="unenrolledList" class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th style="padding-left: 10px; padding-right: 10px;"></th>
+                    <th>UserID</th>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+              <button type="button" id="confirm" class="btn btn-primary">確定</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="AlertModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header bg-danger">
+              <h5 class="modal-title" id="exampleModalLabel">Alert</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body text-center">
+              <span></span>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="recognizeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header bg-info">
+              <h5 class="modal-title" id="exampleModalLabel">辨識結果</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body" style="min-height: 350px;">
+              <div id="loader" style="text-align: center">
+                <img src="/img/loading.gif" style="display: block; margin-left: auto; margin-right: auto;" width="30%">
+                <h5 style="display: block; margin-left: auto; margin-right: auto;">辨識中請稍後</h5>
+              </div>
+              <div id="recognize-result" style="display: none;">
+                <h3 style="margin-left: 10px; margin-bottom: 10px;">請選擇要進行報到的人臉</h3>
+                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12" style="text-align: center;">
+                  <canvas id="myCanvas" height="300" width="300"></canvas>
+                </div>
+                <div class="col-lg-5 col-md-6 col-sm-12 col-xs-12" style="float: right; margin-bottom: 30px;">
+                  <table class="table dataTable table-hover" cellspacing="0" width="100%">
+                    <thead>
+                      <th>#</th>
+                      <th>UserID</th>
+                      <th>Name></th>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="padding-top: 0; padding-bottom: 0;">
+              <button type="button" id="recognize-register" class="btn btn-default" style="display: none; margin-bottom: 10px;">註冊並報到</button>
+              <button type="button" id="recognize-checkin" class="btn btn-default" style="display: none; margin-bottom: 10px;">確認報到</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-bottom: 10px;">關閉</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="knownModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">請選擇對應的使用者資料</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+              <div class="row" style="text-align: center;">
+                <span style="margin-right: 50px; margin-left: 50px;">報到照片</span><span style="margin-left: 100px;">選擇的使用者照片</span>
+                <br>
+                <img id="compare-img" class="thumbnail" style="width: 200px; display: inline;">
+                <img class="thumbnail" id="compare-user" style="width: 200px; margin-left: 30px; display: inline;" alt="請選擇一筆資料">
+              </div>
+              <div class="row" style="margin-right: auto; margin-left: auto;">
+                <table id="userList" class="table table-bordered table-hover" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th style="display: none;"></th>
+                      <th>UserID</th>
+                      <th>Username</th>
+                      <th>Name</th>
+                      <th>Gender</th>
+                      <th>Role</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+              <button type="button" id="confirm" class="btn btn-primary">確定</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="albumModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">建立活動相簿</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+              <form method="post" action="/activity/createAlbum/<%= activity._id %>">
+                <div class="form-group">
+                  <label>相簿名稱</label>
+                  <input type="text" class="form-control" placeholder="title" name="title">
+                </div>
+                <button type="submit" class="btn btn-default" style="float: right;">建立</button>
+              </form>
+            </div>
+            <div class="modal-footer">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <!-- /.content -->
+  </div>
+    <!-- /.content-wrapper -->
+    <% include partials/admin_footer %>
+    <% include partials/admin_control_sidebar %>
+  </div>
+  <script src="/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/select/1.2.1/js/dataTables.select.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.0/js/dataTables.responsive.min.js"></script>
+  <script src="/js/admin/activity_info.js"></script>
+</body>
+</html>

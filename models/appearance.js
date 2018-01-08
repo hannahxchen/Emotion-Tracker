@@ -12,6 +12,16 @@ var AppearanceSchema = mongoose.Schema({
     type: Date,
     default: Date.now
   }
+},{
+  toObject: {virtuals:true},
+	toJSON: {virtuals:true}
+});
+
+AppearanceSchema.virtual('media', {
+	ref: 'Image',
+	localField: 'media_id',
+	foreignField: 'imageID',
+	justOne: true
 });
 
 autoIncrement.initialize(mongoose.connection);

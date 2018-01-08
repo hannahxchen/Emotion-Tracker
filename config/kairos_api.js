@@ -3,4 +3,4 @@ module.exports.account = {
   app_key : ''
 };
 
-module.exports.gallery = "";
+module.exports.gallery = "TestVM";

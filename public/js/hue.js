@@ -1,7 +1,6 @@
 var hueIP;
 var userCreated = false;
 var username;
-var socket=io.connect();
 var groups;
 
 $.ajax({

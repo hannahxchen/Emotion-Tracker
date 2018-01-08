@@ -1,15 +1,25 @@
 var mongoose = require('mongoose');
-var autoIncrement = require('mongoose-auto-increment');
-var video_prefix = 'vid_';
+var ObjectId = mongoose.Schema.ObjectId;
 
 var VideoSchema = mongoose.Schema({
+  title: String,
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-autoIncrement.initialize(mongoose.connection);
-VideoSchema.plugin(autoIncrement.plugin, { model: 'Video', prefix: video_prefix, field: 'videoID' });
+var VideoPlaylistSchema = mongoose.Schema({
+  title: String,
+  video_list: [{
+    video_id: {type: ObjectId, ref: 'Video'},
+    order: Number
+  }]
+  createdAt: {
+    type: Date,
+    default: Date.now()
+  }
+});
 
 var Video = module.exports.Video = mongoose.model('Video', VideoSchema);
+var VideoPlaylist = module.exports.VideoPlaylist = mongoose.model('Video', VideoPlaylistSchema);
